@@ -1,8 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.timeCalendar {
+/* .timeCalendar {
   .react-datepicker__time-container {
     width: 100%;
     .react-datepicker__time {
@@ -11,4 +7,4 @@
       }
     }
   }
-}
+} */
