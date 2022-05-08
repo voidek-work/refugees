@@ -2,7 +2,7 @@
 import { User } from '@prisma/client';
 import { getSession } from 'next-auth/react';
 
-import { prisma } from '../db';
+import { prisma } from '../../shared/db';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(

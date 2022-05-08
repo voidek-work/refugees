@@ -6,7 +6,7 @@ import logoImage from '/public/logo.png';
 
 import styles from '../styles/Home.module.css';
 
-import { prisma } from './db';
+import { prisma } from '../shared/db';
 
 import type { NextPage } from 'next';
 import { TLoginButton, TLoginButtonSize } from 'react-telegram-auth';

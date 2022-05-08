@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { User, Shifts, DriverChoice, Choice, Direction } from '@prisma/client';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import InputMask from 'react-input-mask';
 import * as Yup from 'yup';
@@ -22,7 +21,7 @@ import {
 import format from 'date-fns/format';
 
 // Create an editable cell renderer
-const EditableCell = ({
+const EditableCell: FC<CellProps<Shifts> & { updateMyData: any }> = ({
   value: initialValue,
   row: { index },
   column: { id },
@@ -31,7 +30,7 @@ const EditableCell = ({
   // We need to keep and update the state of the cell normally
   const [value, setValue] = React.useState(initialValue);
 
-  const onChange = (e) => {
+  const onChange = (e: any) => {
     setValue(e.target.value);
   };
 
@@ -62,6 +61,7 @@ const defaultColumn = {
 };
 
 // Be sure to pass our updateMyData and the skipPageReset option
+// @ts-ignore
 function Table({ columns, data, updateMyData, skipPageReset }) {
   // For this example, we're using pagination to illustrate how to stop
   // the current page from resetting when our data changes
@@ -71,15 +71,25 @@ function Table({ columns, data, updateMyData, skipPageReset }) {
     getTableBodyProps,
     headerGroups,
     prepareRow,
+    // @ts-ignore
     page,
+    // @ts-ignore
     canPreviousPage,
+    // @ts-ignore
     canNextPage,
+    // @ts-ignore
     pageOptions,
+    // @ts-ignore
     pageCount,
+    // @ts-ignore
     gotoPage,
+    // @ts-ignore
     nextPage,
+    // @ts-ignore
     previousPage,
+    // @ts-ignore
     setPageSize,
+    // @ts-ignore
     state: { pageIndex, pageSize },
   } = useTable(
     {
@@ -87,6 +97,7 @@ function Table({ columns, data, updateMyData, skipPageReset }) {
       data,
       defaultColumn,
       // use the skipPageReset option to disable page resetting temporarily
+      // @ts-ignore
       autoResetPage: !skipPageReset,
       // updateMyData isn't part of the API, but
       // anything we put into these options will
@@ -104,20 +115,26 @@ function Table({ columns, data, updateMyData, skipPageReset }) {
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
+            /* eslint-disable react/jsx-key */
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
+                /* eslint-disable react/jsx-props-no-spreading */
                 <th {...column.getHeaderProps()}>{column.render('Header')}</th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
+          {/* @ts-ignore */}
           {page.map((row, i) => {
             prepareRow(row);
             return (
+              /* eslint-disable react/jsx-props-no-spreading */
               <tr {...row.getRowProps()}>
+                {/* @ts-ignore */}
                 {row.cells.map((cell) => {
                   return (
+                    /* eslint-disable react/jsx-props-no-spreading */
                     <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
                   );
                 })}
@@ -240,6 +257,7 @@ export const EditShifts = ({
           //}
           // value={value}
           className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md `}
+          // @ts-ignore
           control={control}
           dateFormat='dd.MM.yyyy HH:mm'
         />
@@ -325,6 +343,7 @@ export const EditShifts = ({
   // When our cell renderer calls updateMyData, we'll use
   // the rowIndex, columnId and new value to update the
   // original data
+  // @ts-ignore
   const updateMyData = (rowIndex, columnId, value) => {
     // We also turn on the flag to not reset the page
     setSkipPageReset(true);

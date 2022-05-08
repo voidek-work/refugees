@@ -1,23 +1,28 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import React, { FC, useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  UseFieldArrayReturn,
+  useForm,
+} from 'react-hook-form';
+import { Shift } from './AddShift';
 import { DatePicker } from './DatePicker';
 
-export const ShiftTime: FC<{
-  update;
-  index;
-  value;
-  control;
-  // register;
-  setValue;
-  watch;
-  remove;
-}> = ({ update, index, value, control, setValue, remove }) => {
-  const { register, handleSubmit } = useForm({
-    defaultValues: value,
-  });
+type ArrayProps = UseFieldArrayReturn<any, 'shifts', 'id'>;
+type OptionalArrayProps = {
+  [key in keyof ArrayProps]?: ArrayProps[keyof ArrayProps];
+};
 
+export const ShiftTime: FC<
+  OptionalArrayProps & {
+    index: number;
+    value: any;
+    control: Control<Shift>;
+    setValue: any;
+  }
+> = ({ index, value, control, setValue, remove }) => {
   const errors: any = {};
 
   const shiftList: any[] = [
@@ -70,6 +75,7 @@ export const ShiftTime: FC<{
           className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
             errors.dateOfShift ? 'is-invalid' : ''
           }`}
+          // @ts-ignore
           control={control}
         />
         {/* <input
@@ -157,6 +163,7 @@ export const ShiftTime: FC<{
           type='button'
           className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'
           onClick={() => {
+            // @ts-ignore
             remove(index);
           }}
         >

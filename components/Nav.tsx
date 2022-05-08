@@ -6,6 +6,7 @@ import personImage from '/public/person.svg';
 import { useRouter } from 'next/router';
 import { User } from '@prisma/client';
 import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 
 export const Nav: FC<{ user?: User }> = ({ user }) => {
   const menuItems = [
@@ -23,18 +24,21 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
   return (
     <nav className='bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-800'>
       <div className='container flex flex-wrap justify-between items-center mx-auto'>
-        <a href='/' className='flex items-center'>
-          <Image
-            className='mr-3 h-6 sm:h-9'
-            src={logoImage}
-            width='36'
-            height='36'
-            alt='Неравнодушные логотип'
-          />
-          <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
-            Неравнодушные
-          </span>
-        </a>
+        <Link href='/'>
+          <a className='flex items-center'>
+            <Image
+              className='mr-3 h-6 sm:h-9'
+              src={logoImage}
+              width='36'
+              height='36'
+              alt='Неравнодушные логотип'
+            />
+            <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
+              Неравнодушные
+            </span>
+          </a>
+        </Link>
+
         <div className='flex gap-2 items-center md:order-2'>
           {user && (
             <>
@@ -104,17 +108,18 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
             {menuItems.map((item) => (
               <li key={item.link}>
-                <a
-                  href={item.link}
-                  className={
-                    activeUrl === item.link
-                      ? `block py-2 pr-4 pl-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white`
-                      : 'block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"'
-                  }
-                  aria-current={activeUrl === item.link ? 'page' : 'false'}
-                >
-                  {item.title}
-                </a>
+                <Link href={item.link}>
+                  <a
+                    className={
+                      activeUrl === item.link
+                        ? `block py-2 pr-4 pl-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white`
+                        : 'block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"'
+                    }
+                    aria-current={activeUrl === item.link ? 'page' : 'false'}
+                  >
+                    {item.title}
+                  </a>
+                </Link>
               </li>
             ))}
           </ul>

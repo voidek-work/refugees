@@ -72,10 +72,11 @@ export const AddShift = ({ user }: { user: User }) => {
     getValues,
     control,
     watch,
+    // @ts-ignore
   } = useForm<Shift>(formOptions);
 
   const { errors } = formState;
-
+  // @ts-ignore
   const onSubmit: SubmitHandler<Shift> = async (data: Shift) => {
     // TODO: Проверить, что все поля зареганы, чекнуть хеппи вей водителя, добавить логику с привязкой
     console.log(data);
@@ -104,8 +105,6 @@ export const AddShift = ({ user }: { user: User }) => {
           ...otherData,
           dateStart: formDateStart,
           dateEnd: dateEnd,
-          // TODO: go to back
-          user: { connect: { id: user.id } },
         };
         const requestOptions = {
           method: 'POST',
@@ -390,8 +389,6 @@ export const AddShift = ({ user }: { user: User }) => {
                       update={update}
                       index={index}
                       value={field}
-                      register={register}
-                      watch={watch}
                       remove={remove}
                     />
                   ))}

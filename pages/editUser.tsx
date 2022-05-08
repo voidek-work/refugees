@@ -2,7 +2,7 @@ import Head from 'next/head';
 
 import { EditUser } from '../components/EditUser';
 import styles from '../styles/Home.module.css';
-import { prisma } from './db';
+import { prisma } from '../shared/db';
 
 import type { NextPage } from 'next';
 import { getSession, GetSessionParams } from 'next-auth/react';

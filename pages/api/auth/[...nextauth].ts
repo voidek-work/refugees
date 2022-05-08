@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 
-import { prisma } from '../../db';
+import { prisma } from '../../../shared/db';
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma),

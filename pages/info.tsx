@@ -5,7 +5,7 @@ import styles from '../styles/Home.module.css';
 import { Nav } from '../components/Nav';
 import { User } from '@prisma/client';
 import { GetSessionParams, getSession } from 'next-auth/react';
-import { prisma } from './db';
+import { prisma } from '../shared/db';
 
 export const Info: NextPage<{ user: User }> = ({ user }) => {
   return (
