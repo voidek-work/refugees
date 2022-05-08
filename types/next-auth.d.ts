@@ -9,4 +9,8 @@ declare module 'next-auth' {
       telegramId: string;
     } & DefaultSession['user'];
   }
+
+  interface JWT extends Record<string, unknown>, DefaultJWT {
+    telegramId: string;
+  }
 }

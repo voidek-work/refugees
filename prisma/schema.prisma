@@ -26,19 +26,39 @@ model User {
   sessions      Session[]
 }
 
+enum Direction {
+  THERE
+  BACK
+}
+
+enum Choice {
+  YES
+  NO
+}
+
+enum DriverChoice {
+  YES
+  NO
+  WITH_DRIVER
+}
+
 model Shifts {
-  id               String   @id @default(cuid())
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  isDriver         Boolean
-  countOfPassenger Int?
-  dateStart        DateTime
-  dateEnd          DateTime
-  comment          String
-  name             String?  @default("")
-  telegram         String?  @default("")
-  phone            String?  @default("")
-  city             String?  @default("")
+  id                 String       @id @default(cuid())
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  isDriver           DriverChoice
+  getVolunteers      Choice?
+  countOfPassenger   Int?
+  dateStart          DateTime
+  dateEnd            DateTime
+  comment            String?
+  telegramNameDriver String?
+  name               String?
+  telegram           String?
+  phone              String?
+  city               String?
+  direction          Direction[]
+
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

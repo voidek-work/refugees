@@ -1,29 +1,22 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { User } from '@prisma/client';
-import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import InputMask from 'react-input-mask';
 import * as Yup from 'yup';
+import { requiredMessage } from '../shared/validations';
 
 export const EditUser = ({ user }: { user: User }) => {
-  console.log(user);
-
   let { phone, city, ...otherUserData } = user;
 
   phone ||= '';
-  city ||= 'Таганрог';
+  city ||= '';
 
-  const router = useRouter();
-
-  // form validation rules // TODO: api
   const validationSchema = Yup.object().shape({
-    // firstName: Yup.string().required('First Name is required'),
-    // lastName: Yup.string().required('Last Name is required'),
-    name: Yup.string().required('Last Name is required'),
-    telegramName: Yup.string().required('Last Name is required'),
-    phone: Yup.string().required('Last Name is required'),
-    city: Yup.string().required('Last Name is required'),
+    name: Yup.string().required(requiredMessage),
+    telegramName: Yup.string().required(requiredMessage),
+    phone: Yup.string().required(requiredMessage),
+    city: Yup.string().required(requiredMessage),
   });
 
   const formOptions = {
@@ -31,13 +24,22 @@ export const EditUser = ({ user }: { user: User }) => {
     defaultValues: { ...otherUserData, phone, city },
   };
 
-  // get functions to build form with useForm() hook
-  const { register, handleSubmit, setValue, formState, getValues, control } =
+  const { register, handleSubmit, formState, setValue, watch } =
     useForm<User>(formOptions);
   const { errors } = formState;
 
+  const [telegramNameValue, cityValue] = watch(['telegramName', 'city']);
+
+  useEffect(() => {
+    if (
+      typeof telegramNameValue === 'string' &&
+      telegramNameValue.includes('https://t.me/')
+    ) {
+      setValue('telegramName', telegramNameValue.replace('https://t.me/', ''));
+    }
+  }, [telegramNameValue]);
+
   const onSubmit: SubmitHandler<User> = async (data: User) => {
-    console.log(data);
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -45,20 +47,20 @@ export const EditUser = ({ user }: { user: User }) => {
     };
 
     try {
-      // TODO: api
       return await fetch('/api/updateUser', requestOptions);
     } catch (e) {
       return console.log(e);
     }
   };
-  const onError = (errors, e) => console.error(errors, e);
 
   return (
     <div className='mt-10 sm:mt-0 mb-10 sm:mb-0'>
       <div className='md:grid md:grid-cols-2 md:gap-6'>
         <h1 className='text-lg mt-5 mb-2'>Редактирование профиля</h1>
+      </div>
+      <div className='md:grid md:grid-cols-2 md:gap-6'>
         <div className='mt-5 md:mt-0 md:col-span-2'>
-          <form onSubmit={handleSubmit<User>(onSubmit, onError)}>
+          <form onSubmit={handleSubmit<User>(onSubmit)}>
             <div className='shadow overflow-hidden sm:rounded-md'>
               <div className='px-4 py-5 bg-white sm:p-6'>
                 <div className='grid grid-cols-6 gap-6'>
@@ -70,10 +72,11 @@ export const EditUser = ({ user }: { user: User }) => {
                       Имя Фамилия
                     </label>
                     <input
-                      type='text'
                       {...register('name')}
+                      type='text'
                       id='name'
                       autoComplete='given-name'
+                      placeholder='Введите имя и фамилию'
                       className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
                         errors.name ? 'is-invalid' : ''
                       }`}
@@ -82,27 +85,6 @@ export const EditUser = ({ user }: { user: User }) => {
                       {errors.name?.message}
                     </div>
                   </div>
-                  {/* <div className='col-span-6 sm:col-span-3'>
-                    <label
-                      htmlFor='lastName'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Фамилия
-                    </label>
-                    <input
-                      type='text'
-                      {...register('lastName')}
-                      id='lastName'
-                      autoComplete='given-name'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.lastName ? 'is-invalid' : ''
-                      }`}
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.lastName?.message}
-                    </div>
-                  </div> */}
-
                   <div className='col-span-6 sm:col-span-3'>
                     <label
                       htmlFor='city'
@@ -114,10 +96,30 @@ export const EditUser = ({ user }: { user: User }) => {
                       {...register('city')}
                       type='text'
                       id='city'
+                      placeholder='Введите город'
                       className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
                         errors.city ? 'is-invalid' : ''
                       }`}
                     />
+                    {!cityValue && (
+                      <div className='text-sm flex gap-2'>
+                        <div className='text-gray-500'>или выберите:</div>
+                        <button
+                          type='button'
+                          className='link text-indigo-500'
+                          onClick={() => setValue('city', 'Таганрог')}
+                        >
+                          Таганрог,
+                        </button>
+                        <button
+                          type='button'
+                          className='link text-indigo-500'
+                          onClick={() => setValue('city', 'Ростов-на-Дону')}
+                        >
+                          Ростов-на-Дону
+                        </button>
+                      </div>
+                    )}
                     <div className='invalid-feedback'>
                       {errors.city?.message}
                     </div>
@@ -151,16 +153,21 @@ export const EditUser = ({ user }: { user: User }) => {
                     >
                       Ссылка на телеграм
                     </label>
-                    <input
-                      type='text'
-                      {...register('telegramName')}
-                      id='telegramName'
-                      autoComplete='given-name'
-                      placeholder='https://t.me/username'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.telegramName ? 'is-invalid' : ''
-                      }`}
-                    />
+                    <div className='mt-1 flex rounded-md shadow-sm'>
+                      <span className='inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm'>
+                        https://t.me/
+                      </span>
+                      <input
+                        {...register('telegramName')}
+                        type='text'
+                        id='telegramName'
+                        autoComplete='given-name'
+                        placeholder='username'
+                        className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300 ${
+                          errors.telegramName ? 'is-invalid' : ''
+                        }`}
+                      />
+                    </div>
                     <div className='text-sm text-gray-500'>
                       Находится в настройках сверху, необходимо скопировать имя
                       пользователя и вставить его сюда.

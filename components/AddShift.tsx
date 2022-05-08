@@ -1,23 +1,45 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { User, Shifts } from '@prisma/client';
+import { User, Shifts, DriverChoice, Choice, Direction } from '@prisma/client';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import InputMask from 'react-input-mask';
 import * as Yup from 'yup';
 
 import { DatePicker } from './DatePicker';
+import { requiredMessage } from '../shared/validations';
+import parse from 'date-fns/parse';
+import { ShiftTime } from './ShiftTime';
+import set from 'date-fns/set';
+import { add } from 'date-fns';
+
+// enum Direction {
+//   THERE = 'there',
+//   BACK = 'back',
+// }
+
+// enum Choice {
+//   YES = 'yes',
+//   NO = 'no',
+// }
 
 export type Shift = Shifts & {
-  // name: string;
-  // telegram: string;
-  // phone: string;
   dateOfShift: Date;
   timeOfStart: string;
   timeOfEnd: string;
   shifts: any[];
-  // city: string;
-  // isDriver: string;
+  // TODO: rename
+  shiftsList: string;
+  getVolunteers: Choice;
+  direction: Direction;
+};
+
+type ShiftTime = {
+  id: string;
+  timeOfStart: string;
+  timeOfEnd: string;
+  note: string;
+  canCombineWith: string[];
 };
 
 export const AddShift = ({ user }: { user: User }) => {
@@ -25,19 +47,20 @@ export const AddShift = ({ user }: { user: User }) => {
 
   // form validation rules
   const validationSchema = Yup.object().shape({
-    // name: Yup.string().required('First Name is required'),
-    // telegram: Yup.string().required('Last Name is required'),
-    // phone: Yup.string().required('Last Name is required'),
-    isDriver: Yup.bool().optional(),
+    isDriver: Yup.string().optional(),
     countOfPassenger: Yup.number().optional(),
-    dateOfShift: Yup.string().optional(),
+    shifts: Yup.array().of(
+      Yup.object().shape({
+        dateOfShift: Yup.string().required(requiredMessage),
+      })
+    ),
     comment: Yup.string().optional(),
     userId: Yup.string(),
+    telegramNameDriver: Yup.string().optional(),
   });
 
   const formOptions = {
     resolver: yupResolver(validationSchema),
-    // defaultValues,
   };
 
   // get functions to build form with useForm() hook
@@ -47,131 +70,92 @@ export const AddShift = ({ user }: { user: User }) => {
     setValue,
     formState,
     getValues,
-    reset,
+    control,
     watch,
   } = useForm<Shift>(formOptions);
 
   const { errors } = formState;
 
   const onSubmit: SubmitHandler<Shift> = async (data: Shift) => {
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    };
-    try {
-      return await fetch('/api/addShift', requestOptions);
-    } catch (e) {
-      return console.log(e);
-    }
-  };
+    // TODO: Проверить, что все поля зареганы, чекнуть хеппи вей водителя, добавить логику с привязкой
+    console.log(data);
 
-  const shiftList = [
-    {
-      id: '1',
-      timeOfStart: '00:00',
-      timeOfEnd: '08:30',
-      note: 'Ночная',
-      canCombineWith: [],
-    },
-    {
-      id: '2',
-      timeOfStart: '08:30',
-      timeOfEnd: '19:00',
-      note: 'Дневная',
-      canCombineWith: [],
-    },
-    {
-      id: '3',
-      timeOfStart: '19:00',
-      timeOfEnd: '00:00',
-      note: 'Вечерняя',
-      canCombineWith: ['4'],
-    },
-    {
-      id: '4',
-      timeOfStart: '00:00',
-      timeOfEnd: '08:30',
-      note: 'Ночная (следующий день)',
-      canCombineWith: ['3'],
-    },
-  ];
+    const { shifts, ...otherData } = data;
 
-  const shiftsControls = register('shifts');
+    const dateClass = new Date();
+    return await Promise.all(
+      shifts.map((shift) => {
+        const { dateOfShift, timeOfStart, timeOfEnd } = shift;
+        const preparedDateOfShift = new Date(dateOfShift);
 
-  const shiftsDisabled = (shift: any) => {
-    console.log('shifts:', getValues('shifts'));
-    const check = (id: string) => {
-      console.log(
-        shiftList.length,
-        shiftList.find((item) => item.id === id),
-        shiftList
-          .find((item) => item.id === id)
-          ?.canCombineWith.includes(shift.id)
-      );
-
-      return (
-        shiftList.length > 0 &&
-        !shiftList
-          .find((item) => item.id === id)
-          ?.canCombineWith.includes(shift.id)
-      );
-    };
-    const shiftsValue = getValues('shifts');
-    return (
-      shiftsValue &&
-      !(Array.isArray(shiftsValue)
-        ? shiftsValue.every(check)
-        : check(shiftsValue))
+        const formDateStart = set(preparedDateOfShift, {
+          hours: parse(timeOfStart, 'HH:mm', dateClass).getHours(),
+          minutes: parse(timeOfStart, 'HH:mm', dateClass).getMinutes(),
+        });
+        const formDateEnd = set(preparedDateOfShift, {
+          hours: parse(timeOfEnd, 'HH:mm', dateClass).getHours(),
+          minutes: parse(timeOfEnd, 'HH:mm', dateClass).getMinutes(),
+        });
+        const dateEnd =
+          formDateEnd > formDateStart
+            ? formDateEnd
+            : add(formDateEnd, { days: 1 });
+        const preparedData: Shifts = {
+          ...otherData,
+          dateStart: formDateStart,
+          dateEnd: dateEnd,
+          // TODO: go to back
+          user: { connect: { id: user.id } },
+        };
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(preparedData),
+        };
+        try {
+          return fetch('/api/addShift', requestOptions);
+        } catch (e) {
+          return console.log(e);
+        }
+      })
     );
   };
 
-  // const [isAnother, setIsAnother] = useState(false);
-
-  // useEffect(() => {
-  //   if (isAnother) {
-  //     reset();
-  //     // bug
-  //     setValue('phone', '');
-  //     setValue('city', 'Таганрог');
-  //   } else {
-  //     let { name, telegramName: telegram, phone, city } = user;
-  //     name ||= '';
-  //     telegram ||= '';
-  //     phone ||= '';
-  //     city ||= 'Таганрог';
-
-  //     setValue('name', name);
-  //     setValue('telegram', telegram);
-  //     setValue('phone', phone);
-  //     setValue('city', city);
-  //   }
-  // }, [isAnother, user]);
-
-  const isDriverControl = register('isDriver', {
-    setValueAs: (v: string) => {
-      console.log('v:', v);
-
-      return v === 'true' || false;
-    },
-  });
+  const { fields, append, prepend, remove, swap, move, insert, update } =
+    useFieldArray({
+      control, // control props comes from useForm (optional: if you are using FormContext)
+      name: 'shifts', // unique name for your Field Array
+    });
 
   const isDriver = watch('isDriver');
+  const getVolunteers = watch('getVolunteers');
+  const shifts = watch('shifts');
 
-  console.log('isDriver:', isDriver);
+  console.log(JSON.stringify(shifts));
+
+  useEffect(() => {
+    if (isDriver === DriverChoice.NO) {
+      setValue('countOfPassenger', 0);
+      setValue('getVolunteers', Choice.YES);
+      setValue('direction', []);
+    }
+  }, [isDriver]);
+
+  useEffect(() => {
+    if (shifts && shifts.length === 0) {
+      append({
+        dateOfShift: '',
+        timeOfStart: '',
+        timeOfEnd: '',
+        shiftsList: '',
+      });
+    }
+  }, [shifts]);
 
   return (
     <div className='mt-10 sm:mt-0 mb-10 sm:mb-0'>
       <div className='md:grid md:grid-cols-2 md:gap-6'>
         <h1 className='text-lg mt-5 mb-2'>Запись на смену</h1>
-        {/* <div className='flex justify-end items-center'>
-          <button
-            onClick={() => setIsAnother(!isAnother)}
-            className='py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500'
-          >
-            {isAnother ? 'Записать себя' : 'Записать другого человека'}
-          </button>
-        </div> */}
       </div>
       <div className='md:grid md:grid-cols-2 md:gap-6'>
         <div className='mt-5 md:mt-0 md:col-span-2'>
@@ -182,30 +166,6 @@ export const AddShift = ({ user }: { user: User }) => {
           >
             <div className='shadow overflow-hidden sm:rounded-md'>
               <div className='px-4 py-5 bg-white sm:p-6'>
-                {/* <div className='grid grid-cols-6 gap-6'>
-                  <div className='col-span-6 sm:col-span-6'>
-                    <label
-                      htmlFor='name'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Имя и фамилия
-                    </label>
-                    <input
-                      type='text'
-                      id='name'
-                      autoComplete='given-name'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.name ? 'is-invalid' : ''
-                      }`}
-                      placeholder='Иван Иванов'
-                      {...register('name')}
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.name?.message}
-                    </div>
-                  </div>
-                </div> */}
-
                 <fieldset className='mt-5'>
                   <div>
                     <legend className='text-base font-medium text-gray-900'>
@@ -220,10 +180,10 @@ export const AddShift = ({ user }: { user: User }) => {
                     <div className='flex items-center'>
                       <input
                         id='isDriverYes'
-                        value={'true'}
+                        value={DriverChoice.YES}
                         type='radio'
                         className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                        {...isDriverControl}
+                        {...register('isDriver')}
                       />
                       <label
                         htmlFor='isDriverYes'
@@ -236,9 +196,9 @@ export const AddShift = ({ user }: { user: User }) => {
                       <input
                         id='isDriverNo'
                         type='radio'
-                        value={'false'}
+                        value={DriverChoice.NO}
                         className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                        {...isDriverControl}
+                        {...register('isDriver')}
                       />
                       <label
                         htmlFor='isDriverNo'
@@ -247,10 +207,24 @@ export const AddShift = ({ user }: { user: User }) => {
                         Нет
                       </label>
                     </div>
+                    <div className='flex items-center'>
+                      <input
+                        id='withDriver'
+                        type='radio'
+                        value={DriverChoice.WITH_DRIVER}
+                        className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                        {...register('isDriver')}
+                      />
+                      <label
+                        htmlFor='withDriver'
+                        className='ml-3 block text-sm font-medium text-gray-700'
+                      >
+                        Нет, но у меня уже есть контакты водителя
+                      </label>
+                    </div>
                   </div>
                 </fieldset>
-                {/* @ts-ignore */}
-                {isDriver === 'true' && (
+                {isDriver === DriverChoice.YES && (
                   <fieldset className='mt-5'>
                     <div>
                       <legend className='text-base font-medium text-gray-900'>
@@ -267,9 +241,10 @@ export const AddShift = ({ user }: { user: User }) => {
                         <div className='flex items-center'>
                           <input
                             id='yesGet'
-                            name='getVolunteers'
+                            value={Choice.YES}
                             type='radio'
                             className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                            {...register('getVolunteers')}
                           />
                           <label
                             htmlFor='yesGet'
@@ -281,9 +256,10 @@ export const AddShift = ({ user }: { user: User }) => {
                         <div className='flex items-center'>
                           <input
                             id='noGet'
-                            name='getVolunteers'
                             type='radio'
+                            value={Choice.NO}
                             className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                            {...register('getVolunteers')}
                           />
                           <label
                             htmlFor='noGet'
@@ -296,209 +272,145 @@ export const AddShift = ({ user }: { user: User }) => {
                           {errors.countOfPassenger?.message}
                         </div>
                       </div>
-                      <div className='items-center'>
-                        <label
-                          htmlFor='countOfPassenger'
-                          className='block text-sm font-medium text-gray-700'
-                        >
-                          Количество человек
-                        </label>
-                        <input
-                          type='number'
-                          {...register('countOfPassenger', {
-                            valueAsNumber: true,
-                          })}
-                          id='countOfPassenger'
-                          autoComplete='given-name'
-                          className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 w-full block shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                            errors.countOfPassenger ? 'is-invalid' : ''
-                          }`}
-                        />
+                      {getVolunteers === Choice.YES && (
+                        <div className='items-center'>
+                          <label
+                            htmlFor='countOfPassenger'
+                            className='block text-sm font-medium text-gray-700'
+                          >
+                            Количество человек
+                          </label>
+                          <input
+                            type='number'
+                            {...register('countOfPassenger', {
+                              valueAsNumber: true,
+                            })}
+                            id='countOfPassenger'
+                            autoComplete='given-name'
+                            className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 w-full block shadow-sm sm:text-sm border-gray-300 rounded-md ${
+                              errors.countOfPassenger ? 'is-invalid' : ''
+                            }`}
+                          />
+                          <div className='invalid-feedback'>
+                            {errors.countOfPassenger?.message}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </fieldset>
+                )}
+                {/* @ts-ignore */}
+                {isDriver === DriverChoice.WITH_DRIVER && (
+                  <fieldset className='mt-5'>
+                    <div>
+                      <legend className='text-base font-medium text-gray-900'>
+                        Вам необходимо указать как вы поедете и ссылку на
+                        телеграмм водителя
+                      </legend>
+                      <p className='text-sm text-gray-500'>
+                        Будьте внимательны, в системе произойдет привязка
+                      </p>
+                    </div>
+
+                    <div className='md:grid md:grid-cols-2 md:gap-6 items-center'>
+                      <div className='mt-4 space-y-4'>
+                        <div className='flex items-center'>
+                          <input
+                            id='there'
+                            type='checkbox'
+                            value={Direction.THERE}
+                            className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                            {...register('direction')}
+                          />
+                          <label
+                            htmlFor='there'
+                            className='ml-3 block text-sm font-medium text-gray-700'
+                          >
+                            Туда
+                          </label>
+                        </div>
+                        <div className='flex items-center'>
+                          <input
+                            id='back'
+                            type='checkbox'
+                            value={Direction.BACK}
+                            className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                            {...register('direction')}
+                          />
+                          <label
+                            htmlFor='back'
+                            className='ml-3 block text-sm font-medium text-gray-700'
+                          >
+                            Обратно
+                          </label>
+                        </div>
                         <div className='invalid-feedback'>
                           {errors.countOfPassenger?.message}
+                        </div>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor='telegramNameDriver'
+                          className='block text-sm font-medium text-gray-700'
+                        >
+                          Ссылка на телеграм водителя
+                        </label>
+                        <div className='mt-1 flex rounded-md shadow-sm'>
+                          <span className='inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm'>
+                            https://t.me/
+                          </span>
+                          <input
+                            type='text'
+                            id='telegramNameDriver'
+                            autoComplete='given-name'
+                            placeholder='username'
+                            className={`focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300 ${
+                              errors.telegramNameDriver ? 'is-invalid' : ''
+                            }`}
+                            {...register('telegramNameDriver')}
+                          />
+                        </div>
+                        <div className='text-sm text-gray-500'>
+                          Находится в настройках сверху, необходимо скопировать
+                          имя пользователя и вставить его сюда.
+                        </div>
+                        <div className='invalid-feedback'>
+                          {errors.telegramNameDriver?.message}
                         </div>
                       </div>
                     </div>
                   </fieldset>
                 )}
-                {/* <div className='grid grid-cols-6 gap-6 mt-5'>
-                  <div className='col-span-6 sm:col-span-3'>
-                    <label
-                      htmlFor='phone'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Телефон
-                    </label>
-                    <InputMask
-                      {...register('phone')}
-                      type='text'
-                      id='phone'
-                      mask='+7 (999) 999-99-99'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.phone ? 'is-invalid' : ''
-                      }`}
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.phone?.message}
-                    </div>
-                  </div>
-                  <div className='col-span-6 sm:col-span-3'>
-                    <label
-                      htmlFor='telegram'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Ссылка на телеграм
-                    </label>
-                    <input
-                      type='text'
-                      id='telegram'
-                      autoComplete='given-name'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.telegram ? 'is-invalid' : ''
-                      }`}
-                      placeholder='https://t.me/username'
-                      {...register('telegram')}
-                    />
-                    <div className='text-sm text-gray-500'>
-                      Находится в настройках сверху, необходимо скопировать имя
-                      пользователя и вставить его сюда.
-                    </div>
-                    <div className='invalid-feedback'>
-                      {errors.telegram?.message}
-                    </div>
-                  </div>
-                </div> */}
                 <div className='grid grid-cols-4 gap-6 mt-5'>
-                  <div className='col-span-4 sm:col-span-2'>
-                    <label
-                      htmlFor='dateOfShift'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Дата выхода на смену
-                    </label>
-                    <DatePicker
-                      {...register('dateOfShift', { valueAsDate: true })}
-                      id='dateOfShift'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.dateOfShift ? 'is-invalid' : ''
-                      }`}
-                      dateFormat='dd.MM.yyyy'
+                  {fields.map((field, index) => (
+                    <ShiftTime
+                      key={field.id}
+                      control={control}
+                      setValue={setValue}
+                      update={update}
+                      index={index}
+                      value={field}
+                      register={register}
+                      watch={watch}
+                      remove={remove}
                     />
-                    <div className='invalid-feedback'>
-                      {errors.dateOfShift?.message}
-                    </div>
-                  </div>
-                  <div className='col-span-2 sm:col-span-1'>
-                    <label
-                      htmlFor='timeOfStart'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Начало смены
-                    </label>
-                    <input
-                      {...register('timeOfStart')}
-                      id='timeOfStart'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.timeOfStart ? 'is-invalid' : ''
-                      }`}
-                      type='time'
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.timeOfStart?.message}
-                    </div>
-                  </div>
-                  <div className='col-span-2 sm:col-span-1'>
-                    <label
-                      htmlFor='timeOfEnd'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Конец смены
-                    </label>
-                    <input
-                      {...register('timeOfEnd')}
-                      id='timeOfEnd'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.timeOfEnd ? 'is-invalid' : ''
-                      }`}
-                      type='time'
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.timeOfEnd?.message}
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className={`grid grid-cols-2 md:grid-cols-${shiftList.length} md:gap-6 mt-5`}
-                >
-                  {shiftList.map((shift) => (
-                    <div key={shift.id} className='mt-5 md:mt-0 md:col-span-1'>
-                      <div>
-                        <div className='flex items-center'>
-                          <input
-                            {...shiftsControls}
-                            value={shift.id}
-                            disabled={shiftsDisabled(shift)}
-                            id={shift.id}
-                            name='shifts'
-                            type='checkbox'
-                            className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                            onChange={(e) => {
-                              const {
-                                target: { checked },
-                              } = e;
-                              console.log(getValues());
-                              if (checked) {
-                                if (shift.canCombineWith.length > 0) {
-                                  const currentValueStart =
-                                    getValues('timeOfStart');
-                                  const currentValueEnd =
-                                    getValues('timeOfEnd');
-                                  // if (getValues('shifts'))
-                                }
-                                setValue('timeOfStart', shift.timeOfStart);
-                                setValue('timeOfEnd', shift.timeOfEnd);
-                              }
-                              shiftsControls.onChange(e);
-                              console.log(getValues());
-                            }}
-                          />
-                          <label
-                            htmlFor='push-everything'
-                            className='ml-3 block text-sm font-medium text-gray-700'
-                          >
-                            {shift.timeOfStart} - {shift.timeOfEnd}
-                          </label>
-                        </div>
-                        {shift.note && (
-                          <div className='text-sm text-gray-500 md:ml-7'>
-                            {shift.note}
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   ))}
+                  <button
+                    type='button'
+                    className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-slate-600 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500'
+                    onClick={() => {
+                      append({
+                        dateOfShift: '',
+                        timeOfStart: '',
+                        timeOfEnd: '',
+                        shiftsList: '',
+                      });
+                      console.log(getValues());
+                    }}
+                  >
+                    Добавить ещё смену
+                  </button>
                 </div>
-                {/* <div className='grid grid-cols-6 gap-6 mt-5'>
-                  <div className='col-span-6 sm:col-span-3'>
-                    <label
-                      htmlFor='city'
-                      className='block text-sm font-medium text-gray-700'
-                    >
-                      Город
-                    </label>
-                    <input
-                      {...register('city')}
-                      type='text'
-                      id='city'
-                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-                        errors.city ? 'is-invalid' : ''
-                      }`}
-                    />
-                    <div className='invalid-feedback'>
-                      {errors.city?.message}
-                    </div>
-                  </div>
-                </div> */}
                 <div className='grid grid-cols-6 gap-6 mt-5'>
                   <div className='col-span-6 sm:col-span-6'>
                     <label
@@ -508,11 +420,11 @@ export const AddShift = ({ user }: { user: User }) => {
                       Комментарий
                     </label>
                     <textarea
-                      {...register('comment')}
                       id='comment'
                       className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
                         errors.comment ? 'is-invalid' : ''
                       }`}
+                      {...register('comment')}
                     />
                     <div className='invalid-feedback'>
                       {errors.comment?.message}
@@ -534,54 +446,6 @@ export const AddShift = ({ user }: { user: User }) => {
               </button>
             </div>
           </form>
-
-          {/* <div className='px-4 py-3 bg-gray-50 text-right sm:px-6'>
-            <button
-              className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-              onClick={async () => {
-                // const chatId =
-                const requestOptions1 = {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                };
-                let updates, response;
-                try {
-                  response = await fetch(
-                    'https://api.telegram.org/bot5232112185:AAGIWqIHz7zoi6FQAsFd-d3P1hxus1H0LcM/getUpdates',
-                    requestOptions1
-                  );
-                  updates = await response.json();
-                } catch (e) {
-                  console.log(e);
-                }
-                const userName = getValues('telegram').replace(
-                  'https://t.me/',
-                  ''
-                );
-                console.log(userName);
-
-                const chatId = updates.result.find(
-                  (item) => item.message.from.username === userName
-                ).message.chat.id;
-
-                const requestOptions = {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ message: 'Подтверждено', chatId }),
-                };
-                try {
-                  return await fetch('/api/bot', requestOptions);
-                } catch (e) {
-                  return console.log(e);
-                }
-              }}
-            >
-              {formState.isSubmitting && (
-                <span className='spinner-border spinner-border-sm mr-1'></span>
-              )}
-              Test TelegramBot
-            </button>
-          </div> */}
         </div>
       </div>
     </div>

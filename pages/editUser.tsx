@@ -7,20 +7,24 @@ import { prisma } from './db';
 import type { NextPage } from 'next';
 import { getSession, GetSessionParams } from 'next-auth/react';
 import { User } from '@prisma/client';
+import { Nav } from '../components/Nav';
 
 const EditUserPage: NextPage<{ user: User }> = ({ user }) => {
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Регистрация</title>
-        <meta name='description' content='Регистрация' />
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
+    <>
+      <Nav user={user} />
+      <div className={styles.container}>
+        <Head>
+          <title>Регистрация</title>
+          <meta name='description' content='Регистрация' />
+          <link rel='icon' href='/favicon.ico' />
+        </Head>
 
-      <main className={styles.main}>
-        <EditUser user={user} />
-      </main>
-    </div>
+        <main className={styles.main}>
+          <EditUser user={user} />
+        </main>
+      </div>
+    </>
   );
 };
 
@@ -46,8 +50,7 @@ export async function getServerSideProps(ctx: GetSessionParams) {
 
   const { createdAt, ...otherUserData } = user;
 
-console.log('userEd', user);
-
+  console.log('userEd', user);
 
   return {
     props: { user: { ...otherUserData, createdAt: createdAt.toISOString() } },

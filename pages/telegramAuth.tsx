@@ -1,5 +1,8 @@
 import { getSession, GetSessionParams, signIn } from 'next-auth/react';
+import Image from 'next/image';
 import Head from 'next/head';
+
+import logoImage from '/public/logo.png';
 
 import styles from '../styles/Home.module.css';
 
@@ -17,54 +20,44 @@ const Auth: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <TLoginButton
-          botName='RefugeesHelpBot'
-          buttonSize={TLoginButtonSize.Large}
-          lang='ru'
-          usePic={false}
-          cornerRadius={20}
-          onAuthCallback={async (user) => {
-            const isHash = true;
-            if (isHash) {
-              const auth = await signIn('credentials', {
-                callbackUrl: '/',
-                ...user,
-              });
-              console.log(auth);
-            }
-            console.log('Hello, user!', user);
-          }}
-          requestAccess={'write'}
-        />
+        <div className='min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
+          <div className='max-w-md w-full'>
+            <div className='flex justify-center'>
+              <Image
+                className='mx-auto h-12 w-auto'
+                src={logoImage}
+                width={300}
+                height={300}
+                alt='Лого неравнодушные'
+              />
+            </div>
+            <h2 className='text-center text-xl font-extrabold text-gray-900'>
+              Войдите в сообщество через Telegram
+            </h2>
+            <div className='mt-5 flex justify-center'>
+              <TLoginButton
+                botName='RefugeesHelpBot'
+                buttonSize={TLoginButtonSize.Large}
+                lang='ru'
+                usePic={false}
+                cornerRadius={6}
+                onAuthCallback={async (user) => {
+                  const isHash = true;
+                  if (isHash) {
+                    await signIn('credentials', {
+                      callbackUrl: '/',
+                      ...user,
+                    });
+                  }
+                }}
+                requestAccess={'write'}
+              />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
 };
-
-// export async function getServerSideProps(ctx: GetSessionParams) {
-//   const session = await getSession(ctx);
-//   let user;
-//   console.log(session?.user);
-//   // TODO: check from session
-//   if (session?.user?.telegramId) {
-//     user = await prisma.user.findUnique({
-//       where: { telegramId: session?.user?.telegramId },
-//     });
-//   }
-
-//   console.log('user', user);
-
-//   if (user) {
-//     console.log('redirect');
-    
-//     return {
-//       redirect: {
-//         destination: '/',
-//         permanent: false,
-//       },
-//     };
-//   }
-//   return { props: {} };
-// }
 
 export default Auth;
