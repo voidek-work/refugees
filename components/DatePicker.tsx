@@ -17,6 +17,8 @@ type Props = {
   name: string;
   control: Control<FieldValues, any> | undefined;
   dateFormat: string;
+  minDate?: Date;
+  maxDate?: Date;
 };
 
 export const DatePicker: FC<Props> = ({
@@ -26,6 +28,8 @@ export const DatePicker: FC<Props> = ({
   name,
   control,
   dateFormat = 'dd.MM.yyyy',
+  minDate,
+  maxDate,
   ...props
 }) => {
   return (
@@ -49,6 +53,8 @@ export const DatePicker: FC<Props> = ({
             id={id}
             locale='ru-RU'
             dateFormat={dateFormat}
+            minDate={minDate}
+            maxDate={maxDate}
           />
           // <></>
         );

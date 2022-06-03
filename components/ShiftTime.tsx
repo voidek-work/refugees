@@ -1,3 +1,4 @@
+import add from 'date-fns/add';
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
 import React, { FC, useEffect } from 'react';
@@ -60,6 +61,9 @@ export const ShiftTime: FC<
   console.log('value', JSON.stringify(value));
   // console.log('shiftsListValue', JSON.stringify(shiftsListValue));
 
+  const minDate = new Date();
+  const maxDate = add(new Date(), { days: 3 });
+
   return (
     <>
       <div className='col-span-4 sm:col-span-2'>
@@ -75,6 +79,8 @@ export const ShiftTime: FC<
           className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
             errors.dateOfShift ? 'is-invalid' : ''
           }`}
+          minDate={minDate}
+          maxDate={maxDate}
           // @ts-ignore
           control={control}
         />
