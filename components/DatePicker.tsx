@@ -19,6 +19,8 @@ type Props = {
   dateFormat: string;
   minDate?: Date;
   maxDate?: Date;
+  showTimeSelect?: boolean;
+  timeFormat?: string;
 };
 
 export const DatePicker: FC<Props> = ({
@@ -30,6 +32,8 @@ export const DatePicker: FC<Props> = ({
   dateFormat = 'dd.MM.yyyy',
   minDate,
   maxDate,
+  showTimeSelect,
+  timeFormat,
   ...props
 }) => {
   return (
@@ -37,7 +41,7 @@ export const DatePicker: FC<Props> = ({
       control={control}
       name={name}
       render={({ field: { onChange, onBlur, value } }) => {
-        console.log('value', value);
+        // console.log('value', value);
 
         return (
           <DatePickerComponent
@@ -55,6 +59,8 @@ export const DatePicker: FC<Props> = ({
             dateFormat={dateFormat}
             minDate={minDate}
             maxDate={maxDate}
+            showTimeSelect={showTimeSelect}
+            timeFormat={timeFormat}
           />
           // <></>
         );

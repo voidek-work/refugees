@@ -112,7 +112,7 @@ export const AddShift = ({ user }: { user: User }) => {
           body: JSON.stringify(preparedData),
         };
         try {
-          return fetch('/api/addShift', requestOptions);
+          return fetch('/api/shift/new', requestOptions);
         } catch (e) {
           return console.log(e);
         }

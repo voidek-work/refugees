@@ -8,7 +8,7 @@ import type { NextPage } from 'next';
 import { getSession, GetSessionParams } from 'next-auth/react';
 import { Shifts, User } from '@prisma/client';
 import { Nav } from '../components/Nav';
-import { EditShifts } from '../components/EditShifts';
+import { EditShifts } from '../components/EditShifts/EditShifts';
 
 const Table: NextPage<{ user: User; shifts: Shifts[] }> = ({
   user,
@@ -72,9 +72,14 @@ export async function getServerSideProps(ctx: GetSessionParams) {
           ...otherShiftData
         } = s;
 
+        console.log('user:', user);
+
         return {
           ...otherShiftData,
-          ...user,
+          user: {
+            ...user,
+            createdAt: user.createdAt.getTime(),
+          },
           createdAt: createdAt.getTime(),
           updatedAt: updatedAt.getTime(),
           dateStart: dateStart.getTime(),
