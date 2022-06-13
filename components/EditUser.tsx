@@ -5,12 +5,15 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import InputMask from 'react-input-mask';
 import * as Yup from 'yup';
 import { requiredMessage } from '../shared/validations';
+import { DatePicker } from './DatePicker';
+import { prepareClientDates } from '../shared/prepareDates';
 
 export const EditUser = ({ user }: { user: User }) => {
-  let { phone, city, ...otherUserData } = user;
+  let { phone, city, passport, ...otherUserData } = user;
 
   phone ||= '';
   city ||= '';
+  passport ||= '';
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required(requiredMessage),
@@ -21,10 +24,10 @@ export const EditUser = ({ user }: { user: User }) => {
 
   const formOptions = {
     resolver: yupResolver(validationSchema),
-    defaultValues: { ...otherUserData, phone, city },
+    defaultValues: { ...otherUserData, phone, city, passport },
   };
 
-  const { register, handleSubmit, formState, setValue, watch } =
+  const { register, handleSubmit, formState, setValue, watch, control } =
     useForm<User>(formOptions);
   const { errors } = formState;
 
@@ -43,7 +46,9 @@ export const EditUser = ({ user }: { user: User }) => {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      body: JSON.stringify(
+        prepareClientDates(data, ['dateOfBirthday', 'createdAt'])
+      ),
     };
 
     try {
@@ -174,6 +179,68 @@ export const EditUser = ({ user }: { user: User }) => {
                     </div>
                     <div className='invalid-feedback'>
                       {errors.telegramName?.message}
+                    </div>
+                  </div>
+                  <div className='col-span-6 sm:col-span-3'>
+                    <label
+                      htmlFor='passportAddress'
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      Место и адрес прописки, как указано в паспорте
+                    </label>
+                    <input
+                      {...register('passportAddress')}
+                      type='text'
+                      id='passportAddress'
+                      autoComplete='given-name'
+                      placeholder=''
+                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
+                        errors.name ? 'is-invalid' : ''
+                      }`}
+                    />
+                    <div className='invalid-feedback'>
+                      {errors.passportAddress?.message}
+                    </div>
+                  </div>
+                  <div className='col-span-6 sm:col-span-3'>
+                    <label
+                      htmlFor='passport'
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      Серия и номер паспорта
+                    </label>
+                    <InputMask
+                      {...register('passport')}
+                      type='text'
+                      id='passport'
+                      mask='9999 999999'
+                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
+                        errors.passport ? 'is-invalid' : ''
+                      }`}
+                    />
+                    <div className='invalid-feedback'>
+                      {errors.passport?.message}
+                    </div>
+                  </div>
+                  <div className='col-span-6 sm:col-span-3'>
+                    <label
+                      htmlFor='dateOfBirthday'
+                      className='block text-sm font-medium text-gray-700'
+                    >
+                      Дата рождения
+                    </label>
+                    <DatePicker
+                      name={`dateOfBirthday`}
+                      id='dateOfBirthday'
+                      className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
+                        errors.dateOfBirthday ? 'is-invalid' : ''
+                      }`}
+                      dateFormat={'dd.MM.yyyy'}
+                      // @ts-ignore
+                      control={control}
+                    />
+                    <div className='invalid-feedback'>
+                      {errors.dateOfBirthday?.message}
                     </div>
                   </div>
                 </div>

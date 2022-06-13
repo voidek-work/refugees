@@ -16,10 +16,6 @@ type CellConf = {
 export const shiftsColumns = () =>
   [
     {
-      Header: 'Сохранить',
-      Cell: StatusCell,
-    },
-    {
       Header: 'Смена',
       columns: [
         {
@@ -64,6 +60,19 @@ export const shiftsColumns = () =>
           accessor: 'user.name',
         },
         {
+          Header: 'Дата рождения',
+          accessor: 'user.dateOfBirthday',
+          Cell: (props) => <DateCell {...props} showTimeSelect={false} />,
+        },
+        {
+          Header: 'Паспортные данные',
+          accessor: 'user.passport',
+        },
+        {
+          Header: 'Адрес',
+          accessor: 'user.passportAddress',
+        },
+        {
           Header: 'Телефон',
           accessor: 'user.phone',
         },
@@ -72,5 +81,9 @@ export const shiftsColumns = () =>
           accessor: 'user.telegramName',
         },
       ],
+    },
+    {
+      Header: 'Сохранить',
+      Cell: StatusCell,
     },
   ] as CellConf[];

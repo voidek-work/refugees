@@ -7,6 +7,7 @@ import { AddShift } from '../components/AddShift';
 import { prisma } from '../shared/db';
 import { getSession, GetSessionParams } from 'next-auth/react';
 import { Nav } from '../components/Nav';
+import { prepareServerDates } from '../shared/prepareDates';
 
 const Home: NextPage<{
   user: User;
@@ -58,10 +59,8 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
-  const { createdAt, ...otherUserData } = user;
-
   return {
-    props: { user: { ...otherUserData, createdAt: createdAt.toISOString() } },
+    props: { user: prepareServerDates(user) },
   };
 }
 

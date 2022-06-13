@@ -1,13 +1,7 @@
 import add from 'date-fns/add';
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
 import React, { FC, useEffect } from 'react';
-import {
-  Control,
-  Controller,
-  UseFieldArrayReturn,
-  useForm,
-} from 'react-hook-form';
+import { Control, Controller, UseFieldArrayReturn } from 'react-hook-form';
+
 import { Shift } from './AddShift';
 import { DatePicker } from './DatePicker';
 
@@ -23,7 +17,7 @@ export const ShiftTime: FC<
     control: Control<Shift>;
     setValue: any;
   }
-> = ({ index, value, control, setValue, remove }) => {
+> = ({ index, control, setValue, remove }) => {
   const errors: any = {};
 
   const shiftList: any[] = [
@@ -50,17 +44,6 @@ export const ShiftTime: FC<
     },
   ];
 
-  // const shiftsValue: any[] = watch('shifts');
-  // const shiftsListValue: string = watch(`shifts.${index}.shiftsList`);
-
-  // useEffect(() => {
-  console.log('value', JSON.stringify(value));
-
-  // }, [shiftsValue]);
-
-  console.log('value', JSON.stringify(value));
-  // console.log('shiftsListValue', JSON.stringify(shiftsListValue));
-
   const minDate = new Date();
   const maxDate = add(new Date(), { days: 3 });
 
@@ -84,14 +67,6 @@ export const ShiftTime: FC<
           // @ts-ignore
           control={control}
         />
-        {/* <input
-          {...register(`shifts.${index}.dateOfShift`)}
-          id='dateOfShift'
-          className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-            errors.dateOfShift ? 'is-invalid' : ''
-          }`}
-          type='text'
-        /> */}
         <div className='invalid-feedback'>{errors.dateOfShift?.message}</div>
       </div>
       <div className='col-span-2 sm:col-span-1'>
@@ -118,15 +93,6 @@ export const ShiftTime: FC<
             />
           )}
         />
-        {/* <input
-          {...register(`shifts.${index}.timeOfStart`)}
-          id='timeOfStart'
-          // disabled={shiftsValue && shiftsValue.length > 0}
-          className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-            errors.timeOfStart ? 'is-invalid' : ''
-          }`}
-          type='time'
-        /> */}
         <div className='invalid-feedback'>{errors.timeOfStart?.message}</div>
       </div>
       <div className='col-span-2 sm:col-span-1'>
@@ -153,15 +119,6 @@ export const ShiftTime: FC<
             />
           )}
         />
-        {/* <input
-          {...register(`shifts.${index}.timeOfEnd`)}
-          id='timeOfEnd'
-          // disabled={shiftsValue && shiftsValue.length > 0}
-          className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md ${
-            errors.timeOfEnd ? 'is-invalid' : ''
-          }`}
-          type='time'
-        /> */}
         <div className='invalid-feedback'>{errors.timeOfEnd?.message}</div>
       </div>
       <div className='col-span-4 sm:col-span-2'>
@@ -230,13 +187,6 @@ export const ShiftTime: FC<
                       />
                     )}
                   />
-                  {/* <input
-                    value={shift.id}
-                    id={shift.id}
-                    type='radio'
-                    className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                    {...register(`shifts.${index}.shiftsList`)}
-                  /> */}
                   <label
                     htmlFor={shift.id}
                     className='ml-3 block text-sm font-medium text-gray-700'

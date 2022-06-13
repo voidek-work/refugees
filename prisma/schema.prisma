@@ -11,19 +11,22 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  createdAt     DateTime  @default(now())
-  name          String?   @default("")
-  image         String?   @default("")
-  telegramName  String?   @unique @default("")
-  telegramId    String?   @unique @default("")
-  phone         String?   @default("")
-  city          String?   @default("")
-  email         String?   @unique
-  emailVerified DateTime?
-  Shifts        Shifts[]
-  accounts      Account[]
-  sessions      Session[]
+  id              String    @id @default(cuid())
+  createdAt       DateTime  @default(now())
+  name            String?   @default("")
+  image           String?   @default("")
+  telegramName    String?   @unique @default("")
+  telegramId      String?   @unique @default("")
+  phone           String?   @default("")
+  city            String?   @default("")
+  email           String?   @unique
+  emailVerified   DateTime?
+  dateOfBirthday  DateTime?
+  passport        String?
+  passportAddress String?
+  Shifts          Shifts[]
+  accounts        Account[]
+  sessions        Session[]
 }
 
 enum Direction {

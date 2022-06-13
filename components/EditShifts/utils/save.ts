@@ -1,5 +1,6 @@
 import { Shifts } from '@prisma/client';
 import debounce from 'debounce';
+import { prepareClientDates } from '../../../shared/prepareDates';
 import { IsLoading, SetIsLoading } from './types';
 
 export const save = (
@@ -10,19 +11,23 @@ export const save = (
   console.log(setIsLoading);
 
   setIsLoading({ ...isLoading, [shift.id!]: true });
-  const { dateStart, dateEnd, countOfPassenger } = shift;
-  delete shift.createdAt;
-  delete shift.updatedAt;
+  const { countOfPassenger, direction } = shift;
+
   delete shift.userId;
 
   const requestOptions = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      ...shift,
+      ...prepareClientDates(shift, [
+        'dateStart',
+        'dateEnd',
+        'createdAt',
+        'updatedAt',
+        'user.dateOfBirthday',
+      ]),
       countOfPassenger: Number(countOfPassenger),
-      dateStart: new Date(dateStart!),
-      dateEnd: new Date(dateEnd!),
+      direction: direction && direction.length > 0 ? direction : [],
     }),
   };
   try {

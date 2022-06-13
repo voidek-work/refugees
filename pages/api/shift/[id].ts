@@ -1,20 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import {
-  Choice,
-  Direction,
-  DriverChoice,
-  Shifts,
-  Prisma,
-} from '@prisma/client';
+import { Shifts, User } from '@prisma/client';
 import { getSession } from 'next-auth/react';
+import TelegramBot from 'node-telegram-bot-api';
 
+import { botMessages } from '../../../shared/botMessages';
 import { prisma } from '../../../shared/db';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import TelegramBot from 'node-telegram-bot-api';
-import format from 'date-fns/format';
-import { botMessages } from '../../../shared/botMessages';
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = process.env.TELEGRAM_TOKEN || '';
@@ -31,23 +23,34 @@ export default async function handler(
   const chatId = session?.user?.telegramId;
 
   if (chatId) {
-    const {
-      user: { city, name, phone, telegramName },
-    } = req.body;
-
-    await prisma.user.update({
-      where: {
-        id: req.body.user.id as string,
-      },
-      data: {
+    if (req.body.user) {
+      const {
         city,
         name,
         phone,
         telegramName,
-      },
-    });
+        dateOfBirthday,
+        passport,
+        passportAddress,
+      } = req.body.user as User;
 
-    delete req.body.user;
+      await prisma.user.update({
+        where: {
+          id: req.body.user.id as string,
+        },
+        data: {
+          city,
+          name,
+          phone,
+          telegramName,
+          dateOfBirthday,
+          passport,
+          passportAddress,
+        },
+      });
+
+      delete req.body.user;
+    }
 
     let shift;
 

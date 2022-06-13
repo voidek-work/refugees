@@ -9,6 +9,7 @@ import { getSession, GetSessionParams } from 'next-auth/react';
 import { Shifts, User } from '@prisma/client';
 import { Nav } from '../components/Nav';
 import { EditShifts } from '../components/EditShifts/EditShifts';
+import { prepareServerDates } from '../shared/prepareDates';
 
 const Table: NextPage<{ user: User; shifts: Shifts[] }> = ({
   user,
@@ -56,37 +57,10 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
-  const { createdAt, ...otherUserData } = user;
-
-  console.log('userEd', user);
-
   return {
     props: {
-      shifts: shifts?.map((s) => {
-        const {
-          createdAt,
-          updatedAt,
-          dateStart,
-          dateEnd,
-          user,
-          ...otherShiftData
-        } = s;
-
-        console.log('user:', user);
-
-        return {
-          ...otherShiftData,
-          user: {
-            ...user,
-            createdAt: user.createdAt.getTime(),
-          },
-          createdAt: createdAt.getTime(),
-          updatedAt: updatedAt.getTime(),
-          dateStart: dateStart.getTime(),
-          dateEnd: dateEnd.getTime(),
-        };
-      }),
-      user: { ...otherUserData, createdAt: createdAt.toISOString() },
+      shifts: shifts?.map(prepareServerDates),
+      user: prepareServerDates(user),
     },
   };
 }

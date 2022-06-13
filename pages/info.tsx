@@ -6,6 +6,7 @@ import { Nav } from '../components/Nav';
 import { User } from '@prisma/client';
 import { GetSessionParams, getSession } from 'next-auth/react';
 import { prisma } from '../shared/db';
+import { prepareServerDates } from '../shared/prepareDates';
 
 export const Info: NextPage<{ user: User }> = ({ user }) => {
   return (
@@ -257,15 +258,12 @@ https://forms.gle/BgdJdE6wjV2V1fao7
 export async function getServerSideProps(ctx: GetSessionParams) {
   const session = await getSession(ctx);
   let user;
-  console.log(session?.user);
 
   if (session?.user?.telegramId) {
     user = await prisma.user.findUnique({
       where: { telegramId: session?.user?.telegramId },
     });
   }
-
-  console.log('user', user);
 
   if (!user) {
     return {
@@ -283,10 +281,8 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
-  const { createdAt, ...otherUserData } = user;
-
   return {
-    props: { user: { ...otherUserData, createdAt: createdAt.toISOString() } },
+    props: { user: prepareServerDates(user) },
   };
 }
 

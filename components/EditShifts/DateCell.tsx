@@ -3,8 +3,10 @@ import React from 'react';
 import { DatePicker } from '../DatePicker';
 import { TableShiftCellProps } from './utils/types';
 
-export const DateCell = (props: TableShiftCellProps) => {
-  const { value, column, row, control } = props;
+export const DateCell = (
+  props: TableShiftCellProps & { showTimeSelect?: boolean }
+) => {
+  const { showTimeSelect = true, column, row, control } = props;
 
   return (
     <>
@@ -18,7 +20,7 @@ export const DateCell = (props: TableShiftCellProps) => {
         // @ts-ignore
         control={control}
         dateFormat='dd.MM.yyyy HH:mm'
-        showTimeSelect
+        showTimeSelect={showTimeSelect}
         timeFormat='HH:mm'
       />
     </>

@@ -8,6 +8,7 @@ import type { NextPage } from 'next';
 import { getSession, GetSessionParams } from 'next-auth/react';
 import { User } from '@prisma/client';
 import { Nav } from '../components/Nav';
+import { prepareServerDates } from '../shared/prepareDates';
 
 const EditUserPage: NextPage<{ user: User }> = ({ user }) => {
   return (
@@ -48,12 +49,8 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
-  const { createdAt, ...otherUserData } = user;
-
-  console.log('userEd', user);
-
   return {
-    props: { user: { ...otherUserData, createdAt: createdAt.toISOString() } },
+    props: { user: prepareServerDates(user) },
   };
 }
 
