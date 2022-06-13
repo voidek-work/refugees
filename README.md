@@ -32,6 +32,8 @@ npx prisma migrate reset
 npx prisma db push
 ```
 
+Ещё не нашёл способ читать env.local, в случае ошибок скопировать env.local в .env, но не коммитить .env
+
 Open [http://refugees.test](http://refugees.test) with your browser to see the result.
 
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
