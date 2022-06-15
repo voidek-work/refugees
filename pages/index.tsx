@@ -1,16 +1,16 @@
-import { PrismaClient, User } from '@prisma/client';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
-import styles from '../styles/Home.module.css';
-import { AddShift } from '../components/AddShift';
-import { prisma } from '../shared/db';
 import { getSession, GetSessionParams } from 'next-auth/react';
-import { Nav } from '../components/Nav';
-import { prepareServerDates } from '../shared/prepareDates';
+import Head from 'next/head';
 
+import { AddShift } from '../components/AddShift';
+import { Nav } from '../components/Nav';
+import { prisma } from '../shared/db';
+import { prepareServerDates } from '../shared/prepareDates';
+import styles from '../styles/Home.module.css';
+import { ExtendedUser } from '../types/extendedUser';
+
+import type { NextPage } from 'next';
 const Home: NextPage<{
-  user: User;
+  user: ExtendedUser;
 }> = ({ user }) => {
   return (
     <>
@@ -59,8 +59,16 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
+  const isSupervisor = !!prisma.supervisor.findUnique({
+    where: { phone: user.phone },
+  });
+
+  const isChief = !!prisma.chief.findUnique({
+    where: { phone: user.phone },
+  });
+
   return {
-    props: { user: prepareServerDates(user) },
+    props: { user: { ...prepareServerDates(user), isSupervisor, isChief } },
   };
 }
 

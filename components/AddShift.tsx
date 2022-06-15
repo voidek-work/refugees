@@ -12,6 +12,7 @@ import parse from 'date-fns/parse';
 import { ShiftTime } from './ShiftTime';
 import set from 'date-fns/set';
 import { add } from 'date-fns';
+import { ExtendedUser } from '../types/extendedUser';
 
 // enum Direction {
 //   THERE = 'there',
@@ -42,8 +43,8 @@ type ShiftTime = {
   canCombineWith: string[];
 };
 
-export const AddShift = ({ user }: { user: User }) => {
-  const router = useRouter();
+export const AddShift = ({ user }: { user: ExtendedUser }) => {
+  const { isSupervisor: userIsSupervisor, isChief: userIsChief } = user;
 
   // form validation rules
   const validationSchema = Yup.object().shape({
@@ -147,6 +148,8 @@ export const AddShift = ({ user }: { user: User }) => {
         timeOfStart: '',
         timeOfEnd: '',
         shiftsList: '',
+        isSupervisor: '',
+        isChief: '',
       });
     }
   }, [shifts]);
@@ -390,6 +393,10 @@ export const AddShift = ({ user }: { user: User }) => {
                       index={index}
                       value={field}
                       remove={remove}
+                      register={register}
+                      userIsSupervisor={userIsSupervisor}
+                      userIsChief={userIsChief}
+                      watch={watch}
                     />
                   ))}
                   <button
@@ -401,6 +408,8 @@ export const AddShift = ({ user }: { user: User }) => {
                         timeOfStart: '',
                         timeOfEnd: '',
                         shiftsList: '',
+                        isSupervisor: false,
+                        isChief: false,
                       });
                       console.log(getValues());
                     }}

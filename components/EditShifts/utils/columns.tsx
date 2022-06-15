@@ -2,7 +2,9 @@ import { Shifts, User } from '@prisma/client';
 import format from 'date-fns/format';
 
 import { DateCell } from '../DateCell';
+import { IsСhiefCell } from '../IsChiefCell';
 import { IsDriverCell } from '../IsDriverCell';
+import { IsSupervisorCell } from '../IsSupervisorCell';
 import { StatusCell } from '../StatusCell';
 import { TableShiftCellProps } from './types';
 
@@ -27,24 +29,41 @@ export const shiftsColumns = () =>
           Header: 'Начало смены',
           accessor: 'dateStart',
           Cell: DateCell,
+          width: 135,
         },
         {
           Header: 'Окончание смены',
           accessor: 'dateEnd',
           Cell: DateCell,
+          width: 135,
         },
         {
           Header: 'Водитель',
           accessor: 'isDriver',
           Cell: IsDriverCell,
+          width: 137,
         },
         {
           Header: 'Количество пассажиров',
           accessor: 'countOfPassenger',
+          width: 76,
         },
         {
           Header: 'Telegram назначенного водителя',
           accessor: 'telegramNameDriver',
+          width: 120,
+        },
+        {
+          Header: 'Старший смены',
+          accessor: 'isSupervisor',
+          Cell: IsSupervisorCell,
+          width: 80,
+        },
+        {
+          Header: 'Начальник штаба',
+          accessor: 'chiefShift',
+          Cell: IsСhiefCell,
+          width: 95,
         },
       ],
     },
@@ -62,11 +81,19 @@ export const shiftsColumns = () =>
         {
           Header: 'Дата рождения',
           accessor: 'user.dateOfBirthday',
-          Cell: (props) => <DateCell {...props} showTimeSelect={false} />,
+          Cell: (props) => (
+            <DateCell
+              {...props}
+              showTimeSelect={false}
+              dateFormat='dd.MM.yyyy'
+            />
+          ),
+          width: 95,
         },
         {
           Header: 'Паспортные данные',
           accessor: 'user.passport',
+          width: 106,
         },
         {
           Header: 'Адрес',
@@ -79,6 +106,7 @@ export const shiftsColumns = () =>
         {
           Header: 'Telegram',
           accessor: 'user.telegramName',
+          width: 124,
         },
       ],
     },

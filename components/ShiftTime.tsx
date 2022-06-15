@@ -1,6 +1,14 @@
+import { ChiefShift, Choice } from '@prisma/client';
 import add from 'date-fns/add';
 import React, { FC, useEffect } from 'react';
-import { Control, Controller, UseFieldArrayReturn } from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  UseFieldArrayReturn,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from 'react-hook-form';
 
 import { Shift } from './AddShift';
 import { DatePicker } from './DatePicker';
@@ -15,10 +23,25 @@ export const ShiftTime: FC<
     index: number;
     value: any;
     control: Control<Shift>;
-    setValue: any;
+    setValue: UseFormSetValue<Shift>;
+    userIsSupervisor: boolean;
+    userIsChief: boolean;
+    register: UseFormRegister<Shift>;
+    watch: UseFormWatch<Shift>;
   }
-> = ({ index, control, setValue, remove }) => {
+> = ({
+  index,
+  control,
+  setValue,
+  remove,
+  register,
+  userIsSupervisor,
+  userIsChief,
+  watch,
+}) => {
   const errors: any = {};
+
+  const chiefShift = watch('chiefShift');
 
   const shiftList: any[] = [
     {
@@ -122,6 +145,71 @@ export const ShiftTime: FC<
         <div className='invalid-feedback'>{errors.timeOfEnd?.message}</div>
       </div>
       <div className='col-span-4 sm:col-span-2'>
+        {(userIsSupervisor || userIsChief) && (
+          <div className='md:grid md:grid-cols-12 md:gap-6'>
+            {userIsChief && (
+              <div className='md:col-span-7 space-y-4'>
+                <div className='flex items-center'>
+                  <input
+                    id='morning'
+                    type='checkbox'
+                    disabled={chiefShift === ChiefShift.EVENING}
+                    value={ChiefShift.MORNING}
+                    className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                    {...register('chiefShift')}
+                  />
+                  <label
+                    htmlFor='morning'
+                    className='ml-3 block text-sm font-medium text-gray-700'
+                  >
+                    Я начальник штаба (утро)
+                  </label>
+                </div>
+                <div className='flex items-center'>
+                  <input
+                    id='evening'
+                    type='checkbox'
+                    value={ChiefShift.EVENING}
+                    disabled={chiefShift === ChiefShift.MORNING}
+                    className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                    {...register('chiefShift')}
+                  />
+                  <label
+                    htmlFor='evening'
+                    className='ml-3 block text-sm font-medium text-gray-700'
+                  >
+                    Я начальник штаба (вечер)
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {userIsSupervisor && (
+              <div className='md:col-span-5 space-y-4'>
+                <div className='flex items-center'>
+                  <input
+                    id='supervisor'
+                    type='checkbox'
+                    value={Choice.YES}
+                    className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
+                    {...register('isSupervisor')}
+                  />
+                  <label
+                    htmlFor='supervisor'
+                    className='ml-3 block text-sm font-medium text-gray-700'
+                  >
+                    Я старший смены
+                  </label>
+                </div>
+              </div>
+            )}
+            <div>
+              <div className='invalid-feedback'>
+                {errors.countOfPassenger?.message}
+              </div>
+            </div>
+          </div>
+        )}
         <button
           type='button'
           className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500'

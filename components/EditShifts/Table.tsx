@@ -90,7 +90,7 @@ export const Table: FC<Props> = ({
   return (
     <>
       <table
-        className='table-auto min-w-full divide-y divide-gray-200 border-b border-gray-200'
+        className='table-auto min-w-max divide-y divide-gray-200 border-b border-gray-200'
         {...getTableProps()}
       >
         <thead className='bg-gray-50'>
@@ -102,7 +102,9 @@ export const Table: FC<Props> = ({
                 <th
                   scope='col'
                   className='group text-center text-xs font-medium text-gray-500 tracking-wider'
-                  {...column.getHeaderProps()}
+                  {...column.getHeaderProps({
+                    style: { width: `${column.width}px` },
+                  })}
                 >
                   {column.render('Header')}
                 </th>

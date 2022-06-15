@@ -45,6 +45,11 @@ enum DriverChoice {
   WITH_DRIVER
 }
 
+enum ChiefShift {
+  MORNING
+  EVENING
+}
+
 model Shifts {
   id                 String       @id @default(cuid())
   createdAt          DateTime     @default(now())
@@ -61,7 +66,8 @@ model Shifts {
   phone              String?
   city               String?
   direction          Direction[]
-
+  isSupervisor       Choice?
+  chiefShift         ChiefShift?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -107,4 +113,14 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Supervisor {
+  name  String
+  phone String @unique
+}
+
+model Chief {
+  name  String
+  phone String @unique
 }

@@ -4,9 +4,15 @@ import { DatePicker } from '../DatePicker';
 import { TableShiftCellProps } from './utils/types';
 
 export const DateCell = (
-  props: TableShiftCellProps & { showTimeSelect?: boolean }
+  props: TableShiftCellProps & { showTimeSelect?: boolean; dateFormat?: string }
 ) => {
-  const { showTimeSelect = true, column, row, control } = props;
+  const {
+    showTimeSelect = true,
+    dateFormat = 'dd.MM.yyyy HH:mm',
+    column,
+    row,
+    control,
+  } = props;
 
   return (
     <>
@@ -16,10 +22,10 @@ export const DateCell = (
         //errors?.dateOfShift ? 'is-invalid' : ''
         //}
         // value={value}
-        className={`mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md `}
+        className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md `}
         // @ts-ignore
         control={control}
-        dateFormat='dd.MM.yyyy HH:mm'
+        dateFormat={dateFormat}
         showTimeSelect={showTimeSelect}
         timeFormat='HH:mm'
       />
