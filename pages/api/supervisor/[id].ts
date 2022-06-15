@@ -13,10 +13,11 @@ export default async function handler(
   const session = await getSession({ req });
 
   const chatId = session?.user?.telegramId;
+  const isAdmin = session?.user?.isAdmin;
 
   let supervisor;
 
-  if (chatId) {
+  if (chatId && isAdmin) {
     switch (req.method) {
       case 'CREATE':
         supervisor = await prisma.supervisor.create({

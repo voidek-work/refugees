@@ -13,8 +13,14 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
     { title: 'Редактировать профиль', link: '/editUser' },
     { title: 'Запись на смену', link: '/' },
     { title: 'Информация', link: '/info' },
-    { title: 'Таблица записей', link: '/table' },
   ];
+
+  if (user?.isAdmin) {
+    menuItems.push(
+      { title: 'Таблица записей', link: '/table' },
+      { title: 'Таблица старших', link: '/supervisors' }
+    );
+  }
 
   const router = useRouter();
 

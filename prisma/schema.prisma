@@ -24,6 +24,7 @@ model User {
   dateOfBirthday  DateTime?
   passport        String?
   passportAddress String?
+  isAdmin         Boolean?
   Shifts          Shifts[]
   accounts        Account[]
   sessions        Session[]

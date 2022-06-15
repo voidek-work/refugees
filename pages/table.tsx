@@ -57,6 +57,12 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
+  if (!user.isAdmin) {
+    return {
+      notFound: true,
+    };
+  }
+
   return {
     props: {
       shifts: shifts?.map(prepareServerDates),

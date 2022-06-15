@@ -12,10 +12,11 @@ export default async function handler(
   const session = await getSession({ req });
 
   const chatId = session?.user?.telegramId;
+  const isAdmin = session?.user?.isAdmin;
 
   let supervisors;
 
-  if (chatId && req.body) {
+  if (chatId && isAdmin && req.body) {
     await prisma.supervisor.deleteMany({});
     supervisors = await prisma.supervisor.createMany({
       data: req.body,

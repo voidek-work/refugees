@@ -65,6 +65,11 @@ export default async function handler(
         },
       });
     } else {
+      // TODO: доработать условие для возможности обновления своих заявок
+      const isAdmin = session?.user?.isAdmin;
+      if (!isAdmin) {
+        return res.end();
+      }
       shift = await prisma.shifts.update({
         where: {
           id: req.query.id as string,

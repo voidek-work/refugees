@@ -57,11 +57,17 @@ export default NextAuth({
       if (user?.telegramId) {
         token.telegramId = user.telegramId;
       }
+      if (user?.isAdmin) {
+        token.isAdmin = user.isAdmin;
+      }
       return token;
     },
     async session({ session, token }) {
       if (token?.telegramId) {
         session.user.telegramId = token.telegramId as string;
+      }
+      if (token?.isAdmin) {
+        session.user.isAdmin = token.isAdmin as boolean;
       }
       return session;
     },

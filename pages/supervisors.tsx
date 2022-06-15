@@ -45,7 +45,7 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     user = await prisma.user.findUnique({
       where: { telegramId: session?.user?.telegramId },
     });
-    supervisors = await prisma.supervisor.findMany();
+    supervisors = await prisma.supervisor.findMany({});
     chiefs = await prisma.chief.findMany();
   }
 
@@ -57,6 +57,16 @@ export async function getServerSideProps(ctx: GetSessionParams) {
       },
     };
   }
+
+  if (!user.isAdmin) {
+    return {
+      notFound: true,
+    };
+  }
+
+  console.log('supervisors:', supervisors);
+  console.log('chiefs:', chiefs);
+  
 
   return {
     props: {
