@@ -76,9 +76,6 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
     // @ts-ignore
   } = useForm<Shift>(formOptions);
 
-  const v = watch();
-  console.log('values:', v);
-
   const { errors } = formState;
   // @ts-ignore
   const onSubmit: SubmitHandler<Shift> = async (data: Shift) => {
@@ -116,8 +113,6 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
           isSupervisor,
         };
 
-        console.log('preparedData:', preparedData);
-
         const requestOptions = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -141,8 +136,6 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
   const isDriver = watch('isDriver');
   const getVolunteers = watch('getVolunteers');
   const shifts = watch('shifts');
-
-  console.log(JSON.stringify(shifts));
 
   useEffect(() => {
     if (isDriver === DriverChoice.NO) {
@@ -422,7 +415,6 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
                         isSupervisor: null,
                         chiefShift: null,
                       });
-                      // console.log(getValues());
                     }}
                   >
                     Добавить ещё смену

@@ -15,9 +15,9 @@ export const EditShifts = ({
   user: User;
   shifts: Shifts[];
 }) => {
-  console.log(shifts);
-
-  const { control, register, getValues } = useForm<{ table: Shifts[] }>({
+  const { control, register, getValues, setValue } = useForm<{
+    table: Shifts[];
+  }>({
     defaultValues: {
       table: shifts,
     },
@@ -51,7 +51,7 @@ export const EditShifts = ({
   // the rowIndex, columnId and new value to update the
   // original data
   // @ts-ignore
-  const updateMyData = (rowIndex, columnId, value) => {
+  const updateMyData = (rowIndex, value) => {
     // We also turn on the flag to not reset the page
     setSkipPageReset(true);
     setData((old) =>
@@ -59,7 +59,7 @@ export const EditShifts = ({
         if (index === rowIndex) {
           return {
             ...old[rowIndex],
-            [columnId]: value,
+            ...value,
           };
         }
         return row;
@@ -97,6 +97,7 @@ export const EditShifts = ({
             register={register}
             save={save}
             getValues={getValues}
+            setValue={setValue}
           />
         </div>
       </div>

@@ -3,22 +3,28 @@ import React, { FC } from 'react';
 
 import { TableShiftCellProps } from './utils/types';
 import loader from '/public/loader.svg';
+import { ShiftStatus } from '@prisma/client';
 
-export const StatusCell: FC<TableShiftCellProps> = ({
+export const CancelCell: FC<TableShiftCellProps> = ({
   row: { original, index },
   row,
   isLoading,
   setIsLoading,
   save,
   getValues,
-  setValue,
   updateMyData,
+  setValue,
 }) => {
+  const isActive = original.status === ShiftStatus.ACTIVE;
+
   return (
     <button
       onClick={() =>
         save({
-          shift: getValues(`table.${index}`),
+          shift: {
+            ...getValues(`table.${index}`),
+            status: isActive ? ShiftStatus.CANCELED : ShiftStatus.ACTIVE,
+          },
           row,
           isLoading,
           setIsLoading,
@@ -27,7 +33,9 @@ export const StatusCell: FC<TableShiftCellProps> = ({
         })
       }
       disabled={isLoading[original.id]}
-      className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center w-full justify-center'
+      className={`${isActive ? 'bg-red-500' : 'bg-green-500'} hover:${
+        isActive ? 'bg-red-700' : 'bg-green-700'
+      } text-white font-bold py-2 px-4 rounded flex items-center w-full justify-center`}
     >
       {isLoading[original.id] ? (
         <Image
@@ -37,8 +45,10 @@ export const StatusCell: FC<TableShiftCellProps> = ({
           height={24}
           alt='загрузка'
         />
+      ) : isActive ? (
+        'Отменить'
       ) : (
-        'Сохранить'
+        'Возобновить'
       )}
     </button>
   );

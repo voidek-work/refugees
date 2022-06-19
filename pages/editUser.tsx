@@ -32,7 +32,6 @@ const EditUserPage: NextPage<{ user: User }> = ({ user }) => {
 export async function getServerSideProps(ctx: GetSessionParams) {
   const session = await getSession(ctx);
   let user;
-  console.log(session?.user);
 
   if (session?.user?.telegramId) {
     user = await prisma.user.findUnique({

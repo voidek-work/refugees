@@ -1,6 +1,11 @@
 import { Shifts } from '@prisma/client';
 import React, { FC } from 'react';
-import { Control, UseFormGetValues, UseFormRegister } from 'react-hook-form';
+import {
+  Control,
+  UseFormGetValues,
+  UseFormRegister,
+  UseFormSetValue,
+} from 'react-hook-form';
 import { TableOptions, usePagination, useTable } from 'react-table';
 
 import { InputCell } from './InputCell';
@@ -15,6 +20,7 @@ type Props = TableOptions<Shifts> & {
   setIsLoading: SetIsLoading;
   save: SaveFn;
   getValues: UseFormGetValues<{ table: Shifts[] }>;
+  setValue: UseFormSetValue<{ table: Shifts[] }>;
 };
 
 export const Table: FC<Props> = ({
@@ -28,6 +34,7 @@ export const Table: FC<Props> = ({
   setIsLoading,
   save,
   getValues,
+  setValue,
 }) => {
   // Set our editable cell renderer as the default Cell renderer
   const defaultColumn = {
@@ -82,6 +89,7 @@ export const Table: FC<Props> = ({
       setIsLoading,
       save,
       getValues,
+      setValue,
     },
     usePagination
   );
@@ -184,5 +192,3 @@ export const Table: FC<Props> = ({
     </>
   );
 };
-
-// console.log(getValues());

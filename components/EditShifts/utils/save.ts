@@ -1,14 +1,41 @@
 import { Shifts } from '@prisma/client';
 import debounce from 'debounce';
-import { prepareClientDates } from '../../../shared/prepareDates';
-import { IsLoading, SetIsLoading } from './types';
+import {
+  prepareClientDates,
+  prepareServerDates,
+} from '../../../shared/prepareDates';
+import { Shift } from '../../AddShift';
+import { IsLoading, SetIsLoading, TableShiftCellProps, SaveFn } from './types';
 
-export const save = (
-  shift: Partial<Shifts>,
-  isLoading: IsLoading,
-  setIsLoading: SetIsLoading
-) => {
-  console.log(setIsLoading);
+export const save: SaveFn = ({
+  row,
+  setIsLoading,
+  isLoading,
+  shift,
+  updateMyData,
+  setValue,
+}) => {
+  if (
+    !row ||
+    !setIsLoading ||
+    !isLoading ||
+    !shift ||
+    !updateMyData ||
+    !setValue
+  ) {
+    throw Error(
+      JSON.stringify({
+        row,
+        setIsLoading,
+        isLoading,
+        shift,
+        updateMyData,
+        setValue,
+      })
+    );
+  }
+
+  const { index } = row;
 
   setIsLoading({ ...isLoading, [shift.id!]: true });
   const { countOfPassenger, direction } = shift;
@@ -31,10 +58,21 @@ export const save = (
     }),
   };
   try {
-    fetch(`/api/shift/${shift.id}`, requestOptions).then((data) => {
-      // TODO: set to form
-      setIsLoading({ ...isLoading, [shift.id!]: false });
-    });
+    fetch(`/api/shift/${shift.id}`, requestOptions)
+      .then((res) => res.json())
+      .then((data) => {
+        const preparedData = prepareClientDates(data, [
+          'dateStart',
+          'dateEnd',
+          'createdAt',
+          'updatedAt',
+          'user.dateOfBirthday',
+        ]);
+
+        setIsLoading({ ...isLoading!, [shift.id!]: false });
+        updateMyData(index, preparedData);
+        setValue(`table.${index}`, preparedData as Shift);
+      });
   } catch (e) {
     setIsLoading({ ...isLoading, [shift.id!]: false });
     return console.log(e);

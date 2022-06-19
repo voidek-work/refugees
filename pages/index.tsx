@@ -33,15 +33,12 @@ const Home: NextPage<{
 export async function getServerSideProps(ctx: GetSessionParams) {
   const session = await getSession(ctx);
   let user;
-  console.log(session?.user);
 
   if (session?.user?.telegramId) {
     user = await prisma.user.findUnique({
       where: { telegramId: session?.user?.telegramId },
     });
   }
-
-  console.log('user', user);
 
   if (!user) {
     return {
@@ -59,13 +56,13 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
-  const isSupervisor = !!prisma.supervisor.findUnique({
+  const isSupervisor = !!(await prisma.supervisor.findUnique({
     where: { phone: user.phone },
-  });
+  }));
 
-  const isChief = !!prisma.chief.findUnique({
+  const isChief = !!(await prisma.chief.findUnique({
     where: { phone: user.phone },
-  });
+  }));
 
   return {
     props: { user: { ...prepareServerDates(user), isSupervisor, isChief } },

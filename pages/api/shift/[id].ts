@@ -84,8 +84,6 @@ export default async function handler(
       });
     }
 
-    console.log('shift:', shift);
-
     botMessages({ shift, bot, chatId });
 
     res.status(200).json(shift);

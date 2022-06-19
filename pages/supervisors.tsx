@@ -64,10 +64,6 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     };
   }
 
-  console.log('supervisors:', supervisors);
-  console.log('chiefs:', chiefs);
-  
-
   return {
     props: {
       supervisors: supervisors?.map(prepareServerDates),

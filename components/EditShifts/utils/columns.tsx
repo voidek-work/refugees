@@ -1,5 +1,6 @@
 import { Shifts, User } from '@prisma/client';
 import format from 'date-fns/format';
+import { CancelCell } from '../CancelCell';
 
 import { DateCell } from '../DateCell';
 import { IsСhiefCell } from '../IsChiefCell';
@@ -113,5 +114,9 @@ export const shiftsColumns = () =>
     {
       Header: 'Сохранить',
       Cell: StatusCell,
+    },
+    {
+      Header: 'Отменить',
+      Cell: CancelCell,
     },
   ] as CellConf[];

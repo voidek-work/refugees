@@ -41,8 +41,6 @@ export const DatePicker: FC<Props> = ({
       control={control}
       name={name}
       render={({ field: { onChange, onBlur, value } }) => {
-        // console.log('value', value);
-
         return (
           <DatePickerComponent
             onChange={onChange}

@@ -254,7 +254,6 @@ export const ShiftTime: FC<
                         onChange={(e) => {
                           if (e?.target?.checked) {
                             // if (value?.shiftsList) {
-                            // console.log(value.shiftsList);
 
                             // const index = shiftList.findIndex((s) => s.id === shiftsListValue);
                             // const shift = shiftList.find((s) => s.id === value.shiftsList)!;
@@ -263,8 +262,6 @@ export const ShiftTime: FC<
                             //   timeOfEnd: shift.timeOfEnd,
                             //   // dateOfShift: new Date(),
                             // });
-
-                            console.log(shift.timeOfStart);
 
                             setValue(
                               `shifts.${index}.timeOfStart`,
@@ -275,7 +272,6 @@ export const ShiftTime: FC<
                               shift.timeOfEnd
                             );
 
-                            console.log(shift.timeOfStart);
                             onChange(shift.id);
                           }
                           // }

@@ -36,7 +36,6 @@ const Table: NextPage<{ user: User; shifts: Shifts[] }> = ({
 export async function getServerSideProps(ctx: GetSessionParams) {
   const session = await getSession(ctx);
   let user, shifts;
-  console.log(session?.user);
 
   if (session?.user?.telegramId) {
     user = await prisma.user.findUnique({

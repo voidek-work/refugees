@@ -13,7 +13,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Shifts>
 ) {
-  console.log(req.body);
   const session = await getSession({ req });
   const { message, chatId = session?.user?.telegramId } = req.body;
   if (session?.user?.telegramId) {

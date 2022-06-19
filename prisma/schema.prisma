@@ -51,6 +51,11 @@ enum ChiefShift {
   EVENING
 }
 
+enum ShiftStatus {
+  ACTIVE
+  CANCELED
+}
+
 model Shifts {
   id                 String       @id @default(cuid())
   createdAt          DateTime     @default(now())
@@ -69,6 +74,7 @@ model Shifts {
   direction          Direction[]
   isSupervisor       Choice?
   chiefShift         ChiefShift?
+  status             ShiftStatus? @default(ACTIVE)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
