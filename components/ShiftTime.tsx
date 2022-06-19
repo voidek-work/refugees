@@ -41,7 +41,8 @@ export const ShiftTime: FC<
 }) => {
   const errors: any = {};
 
-  const chiefShift = watch('chiefShift');
+  const chiefShift = watch(`shifts.${index}.chiefShift`);
+  const isSupervisor = watch(`shifts.${index}.isSupervisor`);
 
   const shiftList: any[] = [
     {
@@ -69,6 +70,15 @@ export const ShiftTime: FC<
 
   const minDate = new Date();
   const maxDate = add(new Date(), { days: 3 });
+
+  useEffect(() => {
+    if (!chiefShift || chiefShift.lenght === 0) {
+      setValue(`shifts.${index}.chiefShift`, null);
+    }
+    if (!isSupervisor) {
+      setValue(`shifts.${index}.isSupervisor`, null);
+    }
+  }, [chiefShift, isSupervisor]);
 
   return (
     <>
@@ -153,10 +163,10 @@ export const ShiftTime: FC<
                   <input
                     id='morning'
                     type='checkbox'
-                    disabled={chiefShift === ChiefShift.EVENING}
+                    disabled={chiefShift?.[0] === ChiefShift.EVENING}
                     value={ChiefShift.MORNING}
                     className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                    {...register('chiefShift')}
+                    {...register(`shifts.${index}.chiefShift`)}
                   />
                   <label
                     htmlFor='morning'
@@ -170,9 +180,9 @@ export const ShiftTime: FC<
                     id='evening'
                     type='checkbox'
                     value={ChiefShift.EVENING}
-                    disabled={chiefShift === ChiefShift.MORNING}
+                    disabled={chiefShift?.[0] === ChiefShift.MORNING}
                     className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                    {...register('chiefShift')}
+                    {...register(`shifts.${index}.chiefShift`)}
                   />
                   <label
                     htmlFor='evening'
@@ -192,7 +202,7 @@ export const ShiftTime: FC<
                     type='checkbox'
                     value={Choice.YES}
                     className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300'
-                    {...register('isSupervisor')}
+                    {...register(`shifts.${index}.isSupervisor`)}
                   />
                   <label
                     htmlFor='supervisor'

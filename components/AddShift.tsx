@@ -76,6 +76,9 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
     // @ts-ignore
   } = useForm<Shift>(formOptions);
 
+  const v = watch();
+  console.log('values:', v);
+
   const { errors } = formState;
   // @ts-ignore
   const onSubmit: SubmitHandler<Shift> = async (data: Shift) => {
@@ -102,11 +105,19 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
           formDateEnd > formDateStart
             ? formDateEnd
             : add(formDateEnd, { days: 1 });
+
+        const { chiefShift, isSupervisor } = shift;
+
         const preparedData: Shifts = {
           ...otherData,
           dateStart: formDateStart,
           dateEnd: dateEnd,
+          chiefShift: chiefShift?.[0],
+          isSupervisor,
         };
+
+        console.log('preparedData:', preparedData);
+
         const requestOptions = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -148,8 +159,8 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
         timeOfStart: '',
         timeOfEnd: '',
         shiftsList: '',
-        isSupervisor: '',
-        isChief: '',
+        isSupervisor: null,
+        chiefShift: null,
       });
     }
   }, [shifts]);
@@ -408,10 +419,10 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
                         timeOfStart: '',
                         timeOfEnd: '',
                         shiftsList: '',
-                        isSupervisor: false,
-                        isChief: false,
+                        isSupervisor: null,
+                        chiefShift: null,
                       });
-                      console.log(getValues());
+                      // console.log(getValues());
                     }}
                   >
                     Добавить ещё смену
