@@ -24,14 +24,15 @@ model User {
   dateOfBirthday  DateTime?
   passport        String?
   passportAddress String?
-  isAdmin         Boolean?
+  // TODO: remove @default(true)
+  isAdmin         Boolean?  @default(true)
   Shifts          Shifts[]
   accounts        Account[]
   sessions        Session[]
 }
 
 enum Direction {
-  THERE
+  TO
   BACK
 }
 
@@ -53,28 +54,30 @@ enum ChiefShift {
 
 enum ShiftStatus {
   ACTIVE
-  CANCELED
+  CANCELLED
 }
 
 model Shifts {
-  id                 String       @id @default(cuid())
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  isDriver           DriverChoice
-  getVolunteers      Choice?
-  countOfPassenger   Int?
-  dateStart          DateTime
-  dateEnd            DateTime
-  comment            String?
-  telegramNameDriver String?
-  name               String?
-  telegram           String?
-  phone              String?
-  city               String?
-  direction          Direction[]
-  isSupervisor       Choice?
-  chiefShift         ChiefShift?
-  status             ShiftStatus? @default(ACTIVE)
+  id                     String       @id @default(cuid())
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  isDriver               DriverChoice
+  getVolunteers          Choice?
+  dateStart              DateTime
+  dateEnd                DateTime
+  comment                String?
+  countOfPassengerTo     Int?
+  countOfPassengerBack   Int?
+  telegramNameDriverTo   String?
+  telegramNameDriverBack String?
+  name                   String?
+  telegram               String?
+  phone                  String?
+  city                   String?
+  direction              Direction[]
+  isSupervisor           Choice?
+  chiefShift             ChiefShift?
+  status                 ShiftStatus? @default(ACTIVE)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

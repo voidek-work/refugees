@@ -38,7 +38,7 @@ export const save: SaveFn = ({
   const { index } = row;
 
   setIsLoading({ ...isLoading, [shift.id!]: true });
-  const { countOfPassenger, direction } = shift;
+  const { countOfPassengerTo, countOfPassengerBack, direction } = shift;
 
   delete shift.userId;
 
@@ -53,7 +53,8 @@ export const save: SaveFn = ({
         'updatedAt',
         'user.dateOfBirthday',
       ]),
-      countOfPassenger: Number(countOfPassenger),
+      countOfPassengerTo: Number(countOfPassengerTo),
+      countOfPassengerBack: Number(countOfPassengerBack),
       direction: direction && direction.length > 0 ? direction : [],
     }),
   };

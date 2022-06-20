@@ -6,12 +6,14 @@ export const validationSchemaShifts = Yup.object().shape({
       dateStart: Yup.string(),
       dateEnd: Yup.string(),
       isDriver: Yup.string(),
-      countOfPassenger: Yup.number(),
+      countOfPassengerTo: Yup.number(),
+      countOfPassengerBack: Yup.number(),
       city: Yup.string(),
       name: Yup.string(),
       phone: Yup.string(),
       telegramName: Yup.string(),
-      telegramNameDriver: Yup.string(),
+      telegramNameDriverTo: Yup.string(),
+      telegramNameDriverBack: Yup.string(),
     })
   ),
 });

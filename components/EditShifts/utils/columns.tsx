@@ -45,13 +45,23 @@ export const shiftsColumns = () =>
           width: 137,
         },
         {
-          Header: 'Количество пассажиров',
-          accessor: 'countOfPassenger',
+          Header: 'Количество пассажиров (туда)',
+          accessor: 'countOfPassengerTo',
           width: 76,
         },
         {
-          Header: 'Telegram назначенного водителя',
-          accessor: 'telegramNameDriver',
+          Header: 'Количество пассажиров (обратно)',
+          accessor: 'countOfPassengerBack',
+          width: 76,
+        },
+        {
+          Header: 'Telegram назначенного водителя (туда)',
+          accessor: 'telegramNameDriverTo',
+          width: 120,
+        },
+        {
+          Header: 'Telegram назначенного водителя (обратно)',
+          accessor: 'telegramNameDriverBack',
           width: 120,
         },
         {

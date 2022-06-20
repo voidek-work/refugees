@@ -23,7 +23,7 @@ export const CancelCell: FC<TableShiftCellProps> = ({
         save({
           shift: {
             ...getValues(`table.${index}`),
-            status: isActive ? ShiftStatus.CANCELED : ShiftStatus.ACTIVE,
+            status: isActive ? ShiftStatus.CANCELLED : ShiftStatus.ACTIVE,
           },
           row,
           isLoading,

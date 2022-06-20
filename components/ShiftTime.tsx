@@ -213,11 +213,6 @@ export const ShiftTime: FC<
                 </div>
               </div>
             )}
-            <div>
-              <div className='invalid-feedback'>
-                {errors.countOfPassenger?.message}
-              </div>
-            </div>
           </div>
         )}
         <button
