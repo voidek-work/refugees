@@ -70,10 +70,6 @@ model Shifts {
   countOfPassengerBack   Int?
   telegramNameDriverTo   String?
   telegramNameDriverBack String?
-  name                   String?
-  telegram               String?
-  phone                  String?
-  city                   String?
   direction              Direction[]
   isSupervisor           Choice?
   chiefShift             ChiefShift?

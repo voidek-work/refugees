@@ -13,6 +13,7 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
     { title: 'Редактировать профиль', link: '/editUser' },
     { title: 'Запись на смену', link: '/' },
     { title: 'Информация', link: '/info' },
+    { title: 'Графики', link: '/schedule' },
   ];
 
   if (user?.isAdmin) {
