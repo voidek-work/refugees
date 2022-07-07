@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import logoImage from '/public/logo.png';
 import personImage from '/public/person.svg';
@@ -26,6 +26,8 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
   const router = useRouter();
 
   const activeUrl = router.asPath;
+  
+  const [menuIsOpened, setMenuIsOpened] = useState(false);
 
   return (
     <nav className='bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-800'>
@@ -74,11 +76,10 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           )}
 
           <button
-            data-collapse-toggle='mobile-menu-2'
             type='button'
             className='order-2 inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600'
-            aria-controls='mobile-menu-2'
-            aria-expanded='false'
+            aria-expanded={menuIsOpened}
+            onClick={() => setMenuIsOpened(!menuIsOpened)}
           >
             <span className='sr-only'>Open main menu</span>
             <svg
@@ -108,8 +109,7 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           </button>
         </div>
         <div
-          className='hidden justify-between items-center w-full md:flex md:w-auto md:order-1'
-          id='mobile-menu-2'
+          className={`${menuIsOpened ? '' : 'hidden'} justify-between items-center w-full md:flex md:w-auto md:order-1`}
         >
           <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
             {menuItems.map((item) => (
