@@ -79,12 +79,12 @@ export const EditSupervisors: FC<{
   return (
     <div className='mt-10 sm:mt-0 mb-10 sm:mb-0'>
       <div className='md:grid md:grid-cols-2 md:gap-6'>
-        <h1 className='text-lg mt-5 mb-2'>Старшие смен и начальники штабов</h1>
+        <h2 className='text-lg mt-5 mb-2'>Старшие смен и начальники штабов</h2>
       </div>
       <div className='md:grid md:grid-cols-2 md:gap-6'>
         <div className='mt-5 md:mt-0 md:col-span-1'>
           <div className='shadow overflow-hidden sm:rounded-md px-4 bg-white sm:p-6'>
-            <h2 className='text-md mb-2'>Старшие смен</h2>
+            <h3 className='text-md mb-2'>Старшие смен</h3>
             {fields.map((field, index) => (
               <EditSupervisorsItem
                 register={register}
@@ -134,7 +134,7 @@ export const EditSupervisors: FC<{
         </div>
         <div className='mt-5 md:mt-0 md:col-span-1'>
           <div className='shadow overflow-hidden sm:rounded-md px-4 bg-white sm:p-6'>
-            <h2 className='text-md mb-2'>Начальники штабов</h2>
+            <h3 className='text-md mb-2'>Начальники штабов</h3>
             {chiefFields.map((field, index) => (
               <EditSupervisorsItem
                 register={register}

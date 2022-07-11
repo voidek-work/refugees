@@ -19,7 +19,7 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
   if (user?.isAdmin) {
     menuItems.push(
       { title: 'Таблица записей', link: '/table' },
-      { title: 'Таблица старших', link: '/supervisors' }
+      { title: 'Настройки', link: '/settings' }
     );
   }
 

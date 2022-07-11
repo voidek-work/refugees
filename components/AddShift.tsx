@@ -13,6 +13,7 @@ import { ShiftTime } from './ShiftTime';
 import set from 'date-fns/set';
 import { add } from 'date-fns';
 import { ExtendedUser } from '../types/extendedUser';
+import { Counts } from '../types/counts';
 
 export type Shift = Shifts & {
   dateOfShift: Date;
@@ -33,7 +34,7 @@ type ShiftTime = {
   canCombineWith: string[];
 };
 
-export const AddShift = ({ user }: { user: ExtendedUser }) => {
+export const AddShift = ({ user }: { user: ExtendedUser, counts: Counts }) => {
   const { isSupervisor: userIsSupervisor, isChief: userIsChief } = user;
 
   // form validation rules
@@ -172,8 +173,7 @@ export const AddShift = ({ user }: { user: ExtendedUser }) => {
                       Вы на машине?
                     </legend>
                     <p className='text-sm text-gray-500'>
-                      Если у Вас нет машины, то Софико свяжется с Вами позже и
-                      передаст контакты волонтёра водителя.
+                      Если у Вас нет машины, то Вам будет назначен волонтёр водитель (при наличии).
                     </p>
                   </div>
                   <div className='mt-4 space-y-4'>

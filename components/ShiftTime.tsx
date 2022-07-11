@@ -158,7 +158,7 @@ export const ShiftTime: FC<
         {(userIsSupervisor || userIsChief) && (
           <div className='md:grid md:grid-cols-12 md:gap-6'>
             {userIsChief && (
-              <div className='md:col-span-7 space-y-4'>
+              <div className='md:col-span-7 space-y-4 mb-5'>
                 <div className='flex items-center'>
                   <input
                     id='morning'

@@ -130,3 +130,14 @@ model Chief {
   name  String
   phone String @unique
 }
+
+enum TimesOfDay {
+  NIGHT
+  DAY
+  EVENING
+}
+
+model MaxCount {
+  type  TimesOfDay @unique
+  count Int
+}
