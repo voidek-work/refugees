@@ -18,7 +18,7 @@ export const Info: NextPage<{ user: User }> = ({ user }) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className={styles.main}>
+      <main className={`${styles.main} p-4 md:p-0`}>
         <h1>ВАЖНАЯ ИНФОРМАЦИЯ! ВСЕМ ПРОЧЕСТЬ</h1>
         {/* <ul className="list-disc"> */}
         <h2 className='mb-3'>
