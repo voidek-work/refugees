@@ -109,7 +109,7 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           </button>
         </div>
         <div
-          className={`${menuIsOpened ? '' : 'hidden'} justify-between items-center w-full md:flex md:w-auto md:order-1`}
+          className={`${menuIsOpened ? '' : 'hidden'} absolute top-14 right-0 justify-between items-center bg-white shadow-md md:static md:flex md:w-auto md:order-1 md:shadow-none`}
         >
           <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
             {menuItems.map((item) => (
@@ -118,8 +118,8 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
                   <a
                     className={
                       activeUrl === item.link
-                        ? `block py-2 pr-4 pl-3 text-white bg-slate-400 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white`
-                        : 'block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"'
+                        ? `block py-2 px-6 text-white bg-slate-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white`
+                        : 'block py-2 px-6 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"'
                     }
                     aria-current={activeUrl === item.link ? 'page' : 'false'}
                   >
