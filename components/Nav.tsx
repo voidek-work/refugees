@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import React, { FC, useState } from 'react';
-import { Transition } from '@headlessui/react'
+import React, { FC, Fragment, useState } from 'react';
+import { Transition, Dialog } from '@headlessui/react'
 
 import logoImage from '/public/logo.png';
 import personImage from '/public/person.svg';
@@ -29,24 +29,12 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
 
   const activeUrl = router.asPath;
   
-  const [menuIsOpened, setMenuIsOpened] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className='relative z-50 md:static md:px-4 md:py-2.5 bg-white border-gray-200 dark:bg-gray-800'>
-      <Transition
-        show={menuIsOpened}
-        enter="transition-opacity duration-300"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="transition-opacity duration-300"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
-      >
-        <div className='fixed top-0 right-0 bottom-0 left-0 bg-slate-700 opacity-10'></div>
-      </Transition>
-
-      <div className='container relative bg-white flex flex-wrap justify-between items-center mx-auto'>
-        <div className="relative z-20 px-2 sm:px-4 py-2.5 md:static md:px-0 md:py-0 flex-auto md:flex-none bg-white">
+    <nav className='md:px-4 md:py-2.5 border-gray-200 bg-white dark:bg-gray-800'>
+      <div className='container flex flex-wrap justify-between items-center mx-auto'>
+        <div className="relative z-20 px-2 sm:px-4 py-2.5 md:static md:px-0 md:py-0 flex-auto md:flex-none bg-white dark:bg-gray-800">
           <Link href='/'>
             <a className='flex items-center'>
               <Image
@@ -63,7 +51,77 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           </Link>
         </div>
 
-        <div className='relative z-20 px-2 sm:px-4 py-2.5 md:static md:px-0 md:py-0 flex gap-2 items-center md:order-2 bg-white'>
+        <div className='hidden justify-between items-center md:flex'>
+          <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
+            {menuItems.map((item) => (
+              <li key={item.link}>
+                <Link href={item.link}>
+                  <a
+                    className={
+                      activeUrl === item.link
+                        ? 'block rounded text-blue-700 dark:text-white'
+                        : 'block text-gray-700 hover:text-blue-700 dark:text-gray-400 dark:hover:text-white"'
+                    }
+                    aria-current={activeUrl === item.link ? 'page' : 'false'}
+                  >
+                    {item.title}
+                  </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <Transition show={isMenuOpen} as={Fragment}>
+          <Dialog onClose={() => setIsMenuOpen(false)}>
+            <div className='fixed top-0 right-0 left-0 z-50 h-14 md:hidden' />
+
+            <Transition.Child
+              as={Fragment}
+              enter="transition-opacity ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-10"
+              leave="transition-opacity ease-in duration-300"
+              leaveFrom="opacity-10"
+              leaveTo="opacity-0"
+            >
+              <div className='fixed top-0 right-0 bottom-0 left-0 bg-slate-700 md:hidden' />
+            </Transition.Child>
+            
+            <Transition.Child
+              as={Fragment}
+              enter="transition-all ease-out duration-300"
+              enterFrom="-top-1/4 -right-full"
+              enterTo="top-14 right-4"
+              leave="transition-all ease-in duration-300"
+              leaveFrom="top-14 right-4"
+              leaveTo="-top-1/4 -right-full"
+            >
+              <Dialog.Panel className="fixed bg-white dark:bg-gray-800 shadow-md md:hidden">
+                <ul className='flex flex-col mt-4'>
+                  {menuItems.map((item) => (
+                    <li key={item.link}>
+                      <Link href={item.link}>
+                        <a
+                          className={
+                            activeUrl === item.link
+                              ? `block py-2 px-6 text-white bg-slate-700 rounded dark:text-white`
+                              : 'block py-2 px-6 text-gray-700 border-b border-gray-100 dark:border-gray-700"'
+                          }
+                          aria-current={activeUrl === item.link ? 'page' : 'false'}
+                        >
+                          {item.title}
+                        </a>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Dialog.Panel>
+            </Transition.Child>
+          </Dialog>
+        </Transition>
+
+        <div className='relative z-20 px-2 sm:px-4 py-2.5 md:static md:px-0 md:py-0 flex gap-2 items-center md:order-2 bg-white dark:bg-gray-800'>
           {user && (
             <>
               <div className='flex flex-col items-end order-1 md:order-0'>
@@ -94,8 +152,8 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           <button
             type='button'
             className='order-2 inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600'
-            aria-expanded={menuIsOpened}
-            onClick={() => setMenuIsOpened(!menuIsOpened)}
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <span className='sr-only'>Open main menu</span>
             <svg
@@ -123,28 +181,6 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
               ></path>
             </svg>
           </button>
-        </div>
-        <div
-          className={`${menuIsOpened ? 'top-14 right-4' : '-top-1/4 -right-full'} fixed justify-between items-center bg-white shadow-md md:static md:flex md:w-auto md:order-1 md:shadow-none transition-all duration-300`}
-        >
-          <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
-            {menuItems.map((item) => (
-              <li key={item.link}>
-                <Link href={item.link}>
-                  <a
-                    className={
-                      activeUrl === item.link
-                        ? `block py-2 px-6 text-white bg-slate-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white`
-                        : 'block py-2 px-6 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"'
-                    }
-                    aria-current={activeUrl === item.link ? 'page' : 'false'}
-                  >
-                    {item.title}
-                  </a>
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </nav>
