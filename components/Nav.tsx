@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import React, { FC, useState } from 'react';
+import { Transition } from '@headlessui/react'
 
 import logoImage from '/public/logo.png';
 import personImage from '/public/person.svg';
@@ -7,6 +8,7 @@ import { useRouter } from 'next/router';
 import { User } from '@prisma/client';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import styles from './Nav.module.css';
 
 export const Nav: FC<{ user?: User }> = ({ user }) => {
   const menuItems = [
@@ -30,24 +32,38 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
   const [menuIsOpened, setMenuIsOpened] = useState(false);
 
   return (
-    <nav className='bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-800'>
-      <div className='container flex flex-wrap justify-between items-center mx-auto'>
-        <Link href='/'>
-          <a className='flex items-center'>
-            <Image
-              className='mr-3 h-6 sm:h-9'
-              src={logoImage}
-              width='36'
-              height='36'
-              alt='Неравнодушные логотип'
-            />
-            <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
-              Неравнодушные
-            </span>
-          </a>
-        </Link>
+    <nav className='relative z-50 md:static md:px-4 md:py-2.5 bg-white border-gray-200 dark:bg-gray-800'>
+      <Transition
+        show={menuIsOpened}
+        enter="transition-opacity duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="transition-opacity duration-300"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <div className='fixed top-0 right-0 bottom-0 left-0 bg-slate-700 opacity-10'></div>
+      </Transition>
 
-        <div className='flex gap-2 items-center md:order-2'>
+      <div className='container relative bg-white flex flex-wrap justify-between items-center mx-auto'>
+        <div className="relative z-20 px-2 sm:px-4 py-2.5 md:static md:px-0 md:py-0 flex-auto md:flex-none bg-white">
+          <Link href='/'>
+            <a className='flex items-center'>
+              <Image
+                className='mr-3 h-6 sm:h-9'
+                src={logoImage}
+                width='36'
+                height='36'
+                alt='Неравнодушные логотип'
+              />
+              <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
+                Неравнодушные
+              </span>
+            </a>
+          </Link>
+        </div>
+
+        <div className='relative z-20 px-2 sm:px-4 py-2.5 md:static md:px-0 md:py-0 flex gap-2 items-center md:order-2 bg-white'>
           {user && (
             <>
               <div className='flex flex-col items-end order-1 md:order-0'>
@@ -109,7 +125,7 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           </button>
         </div>
         <div
-          className={`${menuIsOpened ? '' : 'hidden'} absolute top-14 right-0 justify-between items-center bg-white shadow-md md:static md:flex md:w-auto md:order-1 md:shadow-none`}
+          className={`${menuIsOpened ? 'top-14 right-4' : '-top-1/4 -right-full'} fixed justify-between items-center bg-white shadow-md md:static md:flex md:w-auto md:order-1 md:shadow-none transition-all duration-300`}
         >
           <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
             {menuItems.map((item) => (
