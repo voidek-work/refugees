@@ -18,7 +18,7 @@ export const Info: NextPage<{ user: User }> = ({ user }) => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className={styles.main}>
+      <main className={`${styles.main} p-4 md:p-0`}>
         <h1>ВАЖНАЯ ИНФОРМАЦИЯ! ВСЕМ ПРОЧЕСТЬ</h1>
         {/* <ul className="list-disc"> */}
         <h2 className='mb-3'>
@@ -84,7 +84,7 @@ export const Info: NextPage<{ user: User }> = ({ user }) => {
               className='link text-indigo-500'
               href='https://forms.gle/BgdJdE6wjV2V1fao7'
             >
-              https://forms.gle/BgdJdE6wjV2V1fao7
+              Запись на смену
             </a>
           </p>
         </div>
@@ -157,7 +157,7 @@ export const Info: NextPage<{ user: User }> = ({ user }) => {
               className='link text-indigo-500'
               href='https://docs.google.com/document/d/1tsTD2WtdqfJfhOZU6_Vu34m8SsxKDdtUvm4K27lTkyI/edit?usp=sharing'
             >
-              https://docs.google.com/document/d/1tsTD2WtdqfJfhOZU6_Vu34m8SsxKDdtUvm4K27lTkyI/edit?usp=sharing
+              Ответы на вопросы беженцев
             </a>
           </p>
         </div>
@@ -170,7 +170,7 @@ export const Info: NextPage<{ user: User }> = ({ user }) => {
               className='link text-indigo-500'
               href='https://docs.google.com/spreadsheets/d/1O_2YCt7O0GQMHKNGxbRBvbLm0XbDjFAWZ9XCTp63Cc8/edit#gid=0'
             >
-              https://docs.google.com/spreadsheets/d/1O_2YCt7O0GQMHKNGxbRBvbLm0XbDjFAWZ9XCTp63Cc8/edit#gid=0
+              Таблица дежурств
             </a>
           </p>
         </div>
@@ -179,19 +179,17 @@ export const Info: NextPage<{ user: User }> = ({ user }) => {
         </h3>
         <div className='prose prose-sm leading-5'>
           <p>
-            КПП Весело-Вознесенка
             <a
               className='link text-indigo-500'
               href='https://yandex.ru/maps/org/avtomobilny_punkt_propuska_veselo_voznesenka/23054015073'
             >
-              https://yandex.ru/maps/org/avtomobilny_punkt_propuska_veselo_voznesenka/23054015073
-            </a>
-            ,
+              Автомобильный пункт пропуска Весело-Вознесенка
+            </a>, &nbsp;
             <a
               className='link text-indigo-500'
               href='https://maps.app.goo.gl/SkfDLeSW8GEh9roN7'
             >
-              https://maps.app.goo.gl/SkfDLeSW8GEh9roN7
+              КПП Весело-Вознесенка
             </a>
           </p>
         </div>

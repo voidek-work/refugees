@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import React, { FC } from 'react';
+import React, { FC, Fragment, useState } from 'react';
+import { Transition, Dialog } from '@headlessui/react'
 
 import logoImage from '/public/logo.png';
 import personImage from '/public/person.svg';
@@ -26,30 +27,104 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
   const router = useRouter();
 
   const activeUrl = router.asPath;
+  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className='bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-800'>
-      <div className='container flex flex-wrap justify-between items-center mx-auto'>
-        <Link href='/'>
-          <a className='flex items-center'>
-            <Image
-              className='mr-3 h-6 sm:h-9'
-              src={logoImage}
-              width='36'
-              height='36'
-              alt='Неравнодушные логотип'
-            />
-            <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
-              Неравнодушные
-            </span>
-          </a>
-        </Link>
+    <nav className='lg:px-4 lg:py-2.5 border-gray-200 bg-white dark:bg-gray-800'>
+      <div className='lg:container flex flex-wrap justify-between items-center mx-auto'>
+        <div className="relative z-20 px-2 sm:px-4 py-2.5 lg:static lg:px-0 lg:py-0 flex-auto lg:flex-none bg-white dark:bg-gray-800">
+          <Link href='/'>
+            <a className='flex items-center'>
+              <Image
+                className='mr-3 h-6 sm:h-9'
+                src={logoImage}
+                width='36'
+                height='36'
+                alt='Неравнодушные логотип'
+              />
+              <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
+                Неравнодушные
+              </span>
+            </a>
+          </Link>
+        </div>
 
-        <div className='flex gap-2 items-center md:order-2'>
+        <div className='hidden justify-between items-center lg:flex'>
+          <ul className='flex flex-col mt-4 lg:flex-row lg:space-x-8 lg:mt-0 lg:text-sm lg:font-medium'>
+            {menuItems.map((item) => (
+              <li key={item.link}>
+                <Link href={item.link}>
+                  <a
+                    className={
+                      activeUrl === item.link
+                        ? 'block rounded text-blue-700 dark:text-white'
+                        : 'block text-gray-700 hover:text-blue-700 dark:text-gray-400 dark:hover:text-white"'
+                    }
+                    aria-current={activeUrl === item.link ? 'page' : 'false'}
+                  >
+                    {item.title}
+                  </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <Transition show={isMenuOpen} as={Fragment}>
+          <Dialog onClose={() => setIsMenuOpen(false)}>
+            <div className='fixed top-0 right-0 left-0 z-50 h-14 lg:hidden' />
+
+            <Transition.Child
+              as={Fragment}
+              enter="transition-opacity ease-out"
+              enterFrom="opacity-0"
+              enterTo="opacity-10"
+              leave="transition-opacity ease-in"
+              leaveFrom="opacity-10"
+              leaveTo="opacity-0"
+            >
+              <div className='fixed top-0 right-0 bottom-0 left-0 bg-slate-700 lg:hidden' />
+            </Transition.Child>
+            
+            <Transition.Child
+              as={Fragment}
+              enter="transition-all ease-out"
+              enterFrom="-top-1/4 -right-full"
+              enterTo="top-14 right-4"
+              leave="transition-all ease-in"
+              leaveFrom="top-14 right-4"
+              leaveTo="-top-1/4 -right-full"
+            >
+              <Dialog.Panel className="fixed bg-white dark:bg-gray-800 shadow-md lg:hidden">
+                <ul className='flex flex-col mt-4'>
+                  {menuItems.map((item) => (
+                    <li key={item.link} onClick={() => setIsMenuOpen(false)}>
+                      <Link href={item.link}>
+                        <a
+                          className={
+                            activeUrl === item.link
+                              ? `block py-2 px-6 text-white bg-slate-700 rounded dark:text-white`
+                              : 'block py-2 px-6 text-gray-700 border-b border-gray-100 dark:border-gray-700"'
+                          }
+                          aria-current={activeUrl === item.link ? 'page' : 'false'}
+                        >
+                          {item.title}
+                        </a>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Dialog.Panel>
+            </Transition.Child>
+          </Dialog>
+        </Transition>
+
+        <div className='relative z-20 px-2 sm:px-4 py-2.5 lg:static lg:px-0 lg:py-0 flex gap-2 items-center lg:order-2 bg-white dark:bg-gray-800'>
           {user && (
             <>
-              <div className='flex flex-col items-end order-1 md:order-0'>
-                <span className='md:block hidden text-sm text-gray-700 dark:text-gray-200 dark:hover:text-white'>
+              <div className='flex flex-col items-end order-1 lg:order-0'>
+                <span className='lg:block hidden text-sm text-gray-700 dark:text-gray-200 dark:hover:text-white'>
                   {user?.name}
                 </span>
                 <button
@@ -60,7 +135,7 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
                   Выйти
                 </button>
               </div>
-              <div className='flex order-0 md:order-1 mr-3 text-sm bg-gray-400 rounded-full md:mr-0'>
+              <div className='flex order-0 lg:order-1 mr-3 text-sm bg-gray-400 rounded-full lg:mr-0'>
                 <span className='sr-only'>Открыть меню пользователя</span>
                 <Image
                   className='w-8 h-8 rounded-full'
@@ -74,11 +149,10 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
           )}
 
           <button
-            data-collapse-toggle='mobile-menu-2'
             type='button'
-            className='order-2 inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600'
-            aria-controls='mobile-menu-2'
-            aria-expanded='false'
+            className='order-2 inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600'
+            aria-expanded={isMenuOpen}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <span className='sr-only'>Open main menu</span>
             <svg
@@ -106,29 +180,6 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
               ></path>
             </svg>
           </button>
-        </div>
-        <div
-          className='hidden justify-between items-center w-full md:flex md:w-auto md:order-1'
-          id='mobile-menu-2'
-        >
-          <ul className='flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium'>
-            {menuItems.map((item) => (
-              <li key={item.link}>
-                <Link href={item.link}>
-                  <a
-                    className={
-                      activeUrl === item.link
-                        ? `block py-2 pr-4 pl-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white`
-                        : 'block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"'
-                    }
-                    aria-current={activeUrl === item.link ? 'page' : 'false'}
-                  >
-                    {item.title}
-                  </a>
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </nav>

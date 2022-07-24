@@ -464,6 +464,8 @@ export const AddShift = ({ user }: { user: ExtendedUser, counts: Counts }) => {
                       watch={watch}
                     />
                   ))}
+                </div>
+                <div className='mt-5'>
                   <button
                     type='button'
                     className='inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-slate-600 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500'
