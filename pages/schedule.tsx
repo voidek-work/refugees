@@ -1,30 +1,21 @@
-import {
-  Supervisor,
-  User,
-  Chief,
-  Choice,
-  DriverChoice,
-  ChiefShift,
-  Shifts,
-} from '@prisma/client';
+import { ChiefShift, Choice, DriverChoice, Shifts, User } from '@prisma/client';
+import add from 'date-fns/add';
+import format from 'date-fns/format';
+import isAfter from 'date-fns/isAfter';
+import isBefore from 'date-fns/isBefore';
+import isEqual from 'date-fns/isEqual';
+import set from 'date-fns/set';
 import { getSession, GetSessionParams } from 'next-auth/react';
 import Head from 'next/head';
 
-import { ScheduleShift } from '../components/ScheduleShift/ScheduleShift';
 import { Nav } from '../components/Nav';
+import { ScheduleShift } from '../components/ScheduleShift/ScheduleShift';
 import { prisma } from '../shared/db';
 import { prepareServerDates } from '../shared/prepareDates';
+import { dateEvening, dateMorning, dateNight, dateNightNext } from '../shared/shiftTimes';
 import styles from '../styles/Home.module.css';
 
 import type { NextPage } from 'next';
-import format from 'date-fns/format';
-
-import { ElementType } from 'react';
-import isBefore from 'date-fns/isBefore';
-import set from 'date-fns/set';
-import isEqual from 'date-fns/isEqual';
-import isAfter from 'date-fns/isAfter';
-import add from 'date-fns/add';
 
 type ExtendedShifts = (Shifts & { user: User })[];
 
@@ -81,25 +72,6 @@ export async function getServerSideProps(ctx: GetSessionParams) {
       include: {
         user: true,
       },
-    });
-
-    const dateNight = set(new Date(), {
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      milliseconds: 0,
-    });
-    const dateMorning = set(new Date(), {
-      hours: 8,
-      minutes: 30,
-      seconds: 0,
-      milliseconds: 0,
-    });
-    const dateEvening = set(new Date(), {
-      hours: 19,
-      minutes: 0,
-      seconds: 0,
-      milliseconds: 0,
     });
 
     const makeSupervisor = (shifts: ExtendedShifts) => {
@@ -219,7 +191,7 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     );
     const makeEveningShift = makeShift(
       dateEvening,
-      add(dateNight, { days: 1 }),
+      dateNightNext,
       ChiefShift.MORNING
     );
 

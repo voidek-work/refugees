@@ -9,9 +9,18 @@ import styles from '../styles/Home.module.css';
 import { ExtendedUser } from '../types/extendedUser';
 
 import type { NextPage } from 'next';
+import {
+  dateNight,
+  dateMorning,
+  dateEvening,
+  dateNightNext,
+} from '../shared/shiftTimes';
+import { Counts } from '../types/counts';
+import { TimesOfDay } from '@prisma/client';
 const Home: NextPage<{
   user: ExtendedUser;
-}> = ({ user }) => {
+  counts: Counts;
+}> = ({ user, counts }) => {
   return (
     <>
       <Nav user={user} />
@@ -23,7 +32,7 @@ const Home: NextPage<{
         </Head>
 
         <main className={styles.main}>
-          <AddShift user={user} />
+          <AddShift user={user} counts={counts} />
         </main>
       </div>
     </>
@@ -64,8 +73,66 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     where: { phone: user.phone },
   }));
 
+  const getDatesByType = (type: TimesOfDay) => {
+    switch (type) {
+      case TimesOfDay.NIGHT:
+        return { dateStart: { gte: dateNight }, dateEnd: { lte: dateMorning } };
+      case TimesOfDay.DAY:
+        return {
+          dateStart: { gte: dateMorning },
+          dateEnd: { lte: dateEvening },
+        };
+      case TimesOfDay.EVENING:
+        return {
+          dateStart: { gte: dateEvening },
+          dateEnd: { lte: dateNightNext },
+        };
+    }
+  };
+
+  const getCurrentCounts = (type: TimesOfDay) => {
+    return prisma.shifts.count({
+      where: getDatesByType(type),
+    });
+  };
+
+  const getCount = async (type: TimesOfDay) => ({
+    current: await getCurrentCounts(type),
+    max:
+      (await prisma.maxCount.findMany()).find((c) => c.type === type)?.count ||
+      0,
+  });
+
+  const counts: Counts = {
+    [TimesOfDay.NIGHT]: await getCount(TimesOfDay.NIGHT),
+    [TimesOfDay.DAY]: await getCount(TimesOfDay.DAY),
+    [TimesOfDay.EVENING]: await getCount(TimesOfDay.EVENING),
+  };
+
+  counts[TimesOfDay.NIGHT].current = await prisma.shifts.count({
+    where: {
+      dateStart: { gte: dateNight },
+      dateEnd: { lte: dateMorning },
+    },
+  });
+  counts[TimesOfDay.DAY].current = await prisma.shifts.count({
+    where: {
+      dateStart: { gte: dateMorning },
+      dateEnd: { lte: dateEvening },
+    },
+  });
+  counts[TimesOfDay.EVENING].current = await prisma.shifts.count({
+    where: {
+      dateStart: { gte: dateEvening },
+      dateEnd: { lte: dateNightNext },
+    },
+  });
+
   return {
-    props: { user: { ...prepareServerDates(user), isSupervisor, isChief } },
+    props: {
+      user: { ...prepareServerDates(user), isSupervisor, isChief },
+      counts,
+    },
   };
 }
 

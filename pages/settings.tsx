@@ -1,4 +1,4 @@
-import { Supervisor, User, Chief } from '@prisma/client';
+import { Supervisor, User, Chief, MaxCount } from '@prisma/client';
 import { getSession, GetSessionParams } from 'next-auth/react';
 import Head from 'next/head';
 
@@ -9,19 +9,21 @@ import { prepareServerDates } from '../shared/prepareDates';
 import styles from '../styles/Home.module.css';
 
 import type { NextPage } from 'next';
+import { EditMaxCounts } from '../components/EditMaxCounts/EditMaxCounts';
 
-const Supervisors: NextPage<{
+const Settings: NextPage<{
   user: User;
   supervisors: Supervisor[];
   chiefs: Chief[];
-}> = ({ user, supervisors, chiefs }) => {
+  counts: MaxCount[];
+}> = ({ user, supervisors, chiefs, counts }) => {
   return (
     <>
       <Nav user={user} />
       <div className={styles.container}>
         <Head>
-          <title>Таблица редактирования старших</title>
-          <meta name='description' content='Таблица редактирования старших' />
+          <title>Настройки</title>
+          <meta name='description' content='Настройки' />
           <link rel='icon' href='/favicon.ico' />
         </Head>
 
@@ -31,6 +33,7 @@ const Supervisors: NextPage<{
             chiefs={chiefs}
             supervisors={supervisors}
           />
+          <EditMaxCounts counts={counts} />
         </main>
       </div>
     </>
@@ -39,7 +42,7 @@ const Supervisors: NextPage<{
 
 export async function getServerSideProps(ctx: GetSessionParams) {
   const session = await getSession(ctx);
-  let user, supervisors, chiefs;
+  let user, supervisors, chiefs, counts;
 
   if (session?.user?.telegramId) {
     user = await prisma.user.findUnique({
@@ -47,6 +50,7 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     });
     supervisors = await prisma.supervisor.findMany({});
     chiefs = await prisma.chief.findMany();
+    counts = await prisma.maxCount.findMany();
   }
 
   if (!user) {
@@ -68,9 +72,10 @@ export async function getServerSideProps(ctx: GetSessionParams) {
     props: {
       supervisors: supervisors?.map(prepareServerDates),
       chiefs: chiefs?.map(prepareServerDates),
+      counts: counts?.map(prepareServerDates),
       user: prepareServerDates(user),
     },
   };
 }
 
-export default Supervisors;
+export default Settings;
