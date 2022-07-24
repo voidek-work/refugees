@@ -77,10 +77,10 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
 
             <Transition.Child
               as={Fragment}
-              enter="transition-opacity ease-out duration-300"
+              enter="transition-opacity ease-out"
               enterFrom="opacity-0"
               enterTo="opacity-10"
-              leave="transition-opacity ease-in duration-300"
+              leave="transition-opacity ease-in"
               leaveFrom="opacity-10"
               leaveTo="opacity-0"
             >
@@ -89,17 +89,17 @@ export const Nav: FC<{ user?: User }> = ({ user }) => {
             
             <Transition.Child
               as={Fragment}
-              enter="transition-all ease-out duration-300"
+              enter="transition-all ease-out"
               enterFrom="-top-1/4 -right-full"
               enterTo="top-14 right-4"
-              leave="transition-all ease-in duration-300"
+              leave="transition-all ease-in"
               leaveFrom="top-14 right-4"
               leaveTo="-top-1/4 -right-full"
             >
               <Dialog.Panel className="fixed bg-white dark:bg-gray-800 shadow-md md:hidden">
                 <ul className='flex flex-col mt-4'>
                   {menuItems.map((item) => (
-                    <li key={item.link}>
+                    <li key={item.link} onClick={() => setIsMenuOpen(false)}>
                       <Link href={item.link}>
                         <a
                           className={
